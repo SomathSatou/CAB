@@ -267,7 +267,6 @@ class AEPermutation:
                 if not childs[1].__contains__(parents[0][index]):
                     childs[1][childs[1].index(0)] = parents[0][index]
 
-
         else:
             childs = parents.copy()
 

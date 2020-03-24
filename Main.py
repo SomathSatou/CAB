@@ -14,11 +14,12 @@ CMax =10000 # nombre limite d'itérations pour l'algoritme
 
 Seed = 9001
 for i in range(0,50):
+    print('debut des test pour la seed ' + str(Seed))
     np.random.seed(Seed)
     Seed = Seed+1
 
     # initialisation de la population
-    Run = AEPermutation(N, P, M, C, CMax)
+    Run = AEPermutation(loader, P, M, C, CMax)
 
     # exécution simple pour première face de test
 
@@ -38,6 +39,6 @@ for i in range(0,50):
     # methodList = [[1, 1, 1, 1], [1, 1, 1, 2]]
 
     # test
-    methodList = [[1, 1, 2, 1]]
+    methodList = [[1, 1, 1, 1]]
 
     Run.launch(methodList, False)

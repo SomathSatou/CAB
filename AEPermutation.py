@@ -339,6 +339,18 @@ class AEPermutation:
         return childs
     # endregion Recombination
 
+    def edge(self,parents):
+
+        childs = [[0] * self.Size, [0] * self.Size]
+
+        return childs
+
+    def cycle(self,parents):
+        childs = [[0] * self.Size, [0] * self.Size]
+
+        return childs
+
+
     # region Mutation
     def swap(self):
         childs = self.Childrens
@@ -377,12 +389,6 @@ class AEPermutation:
                     tmp = child[B - ((B - A) / 2)]
                     child[B - ((B - A) / 2)] = child[B - (i - A)]
                     child[B - (i - A)] = tmp
-        return
-
-    def edge(self):
-        return
-
-    def cycle(self):
         return
 
     # endregion Mutation

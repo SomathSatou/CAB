@@ -6,7 +6,7 @@ from random import *
 
 
 class AEPermutation:
-    def __init__(self, taille, pop, mut, rec, nbcMax):
+    def __init__(self, data, pop, mut, rec, nbcMax):
         # region Parameters
         self.x = []
         self.y = []
@@ -44,7 +44,7 @@ class AEPermutation:
             2: self.elder
         }
 
-        self.Size = taille
+        self.Size = data.Size
         self.SizePop = pop
         self.MutationProb = mut
         self.RecombinationProp = rec
@@ -60,6 +60,7 @@ class AEPermutation:
             shuffle(tmpIndividu)
             self.Population.append(tmpIndividu)
 
+        self.data = data.data
         # endregion Parameters
 
     def launch(self, methodList, displayMoy):
@@ -98,25 +99,22 @@ class AEPermutation:
                 self.parents = select()
 
                 # Recombine
-
                 self.Childrens = recombine(self.parents)
 
                 # mutation
-
                 mutation()
 
                 # evaluate children
                 self.evaluatechildren()
 
                 # Reinsertion
-
                 reinsertion()
 
                 # graph Value
                 self.evaluate()
                 nbCycle = nbCycle + 1
                 affichage = "nombre de tour effectuer : " + str(nbCycle) + "/" + str(self.nbCycleMax)
-                # print(affichage)
+                print(affichage)
                 self.x.append(nbCycle)
                 self.y.append(self.CurrentBest())
                 self.moyY.append(np.mean(self.CurrentEval))
@@ -125,7 +123,7 @@ class AEPermutation:
 
             fichier = open(Label + ".txt", "a")
 
-            for elt in y:
+            for elt in self.y:
                 fichier.write(str(elt) + ";")
 
             fichier.write("\n")
@@ -263,7 +261,7 @@ class AEPermutation:
                     next = parents[0][i]
                     check = parents[1].index(next)
 
-                    while childs[0].__contains__(check):
+                    while childs[0].__contains__(check) and childs[0].__contains__(0):
                         next = parents[0][check]
                         check = parents[1].index(next)
 
@@ -307,11 +305,12 @@ class AEPermutation:
         return childs
 
     def crossover(self,parents):
+        childs = [[0] * self.Size, [0] * self.Size]
+
         if randint(0, 100) < self.RecombinationProp:
             pivot1 = randint(0, self.Size - 1)
             pivot2 = randint(pivot1 + 1, self.Size)
 
-            childs = [[0] * self.Size, [0] * self.Size]
 
             # k prends le segment du parents 1
             for i in range(pivot1, pivot2):
@@ -438,17 +437,34 @@ class AEPermutation:
         return False
 
     def fitness(self, elt):
+        return self.fitness1(elt)
+
+    def fillD(self, elt):
+        ret = []
+        for i in range(0, (self.Size//2)-1):
+            tmp = 0
+            for j in range(0, len(self.data)):
+                for k in range(0, len(self.data[j])):
+                    if abs(elt[j]-elt[k]) == i:
+                        tmp = tmp +1
+            ret.append(tmp//2)
+        return ret
+
+    def maxDelta(self):
+        max = 0
+        for elt in self.data:
+            if len(elt) > max:
+                max = len(elt)
+        return max
+
+    def fitness1(self, elt):
+        delta = self.maxDelta()
+        d = self.fillD(elt)
         ret = 0
-        for i in range(0, self.Size - 2):
-            for j in range(0, self.Size - 1):
-                if i < j:
-                    dif = elt[i] - elt[j]
-                    if dif == 0:
-                        ret += 1
-                    if dif == i - j:
-                        ret += 1
-                    if dif == j - i:
-                        ret += 1
+        for i in range(1, self.Size//2):
+
+            ret = ret + (delta * ((self.Size//2) - i + 1) * d[i-1])
+
         return ret
 
     def terminaison(self):

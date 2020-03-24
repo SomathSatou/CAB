@@ -19,10 +19,7 @@ class Parser:
 
             for i in range(2, len(content)):
                 line = content[i].split(' ')
-                print(line)
                 self.data[int(line[0])-1].append(int(line[1]))
                 self.data[int(line[1])-1].append(int(line[0]))
 
-            for elt in self.data:
-                print(elt)
         return

@@ -17,8 +17,9 @@ class AEPermutation:
         self.mutationType = 1
         self.mutSwitch = {
             1: self.swap,
-            2: self.reinsert,
-            3: self.flip
+            2: self.flip,
+            3: self.slide,
+            4: self.partialRandom
         }
 
         self.selectionType = 4
@@ -31,8 +32,10 @@ class AEPermutation:
 
         self.recombinationType = 1
         self.recSwitch = {
-            1: self.Pmx,
-            2: self.crossover
+            1: self.crossover,
+            2: self.Pmx,
+            3: self.edge,
+            4: self.cycle
         }
 
         self.reinsertionType = 1
@@ -197,7 +200,7 @@ class AEPermutation:
     # endregion Selection
 
     # region Recombination
-    def Pmx(self, parents):
+    def Pmx_nreine(self, parents):
         childs = self.parents.copy()
         indexRand = []
         if randint(0, 100) < self.RecombinationProp:
@@ -242,7 +245,37 @@ class AEPermutation:
             print("rcombinaitionDone")
         return childs
 
-    def crossover(self, parents):
+    def Pmx(self, parents):
+        if randint(0, 100) < self.RecombinationProp:
+            pivot1 = randint(0, self.Size-1)
+            pivot2 = randint(pivot1+1, self.Size)
+
+            childs = [[0] * self.Size, [0] * self.Size]
+
+            #k prends le segment du parents 1
+            for i in range(pivot1,pivot2):
+                childs[0][i] = parents[0][i]
+
+            # ajouter les elemnents du parents 2 qui ne sont pas déjç présent
+            for i in range(pivot1,pivot2):
+                if not childs[0].__contains__(parents[1][i]) :
+                    next = parents[0][i]
+                    check = parents[1].index(next)
+
+                    while childs[0].__contains__(check):
+                        next = parents[0][check]
+                        check = parents[1].index(next)
+
+                    childs[0][check] = parents[0][i]
+
+            #remplissage des blancs 
+            for i in range(0, self.Size):
+                if childs[0][i] == 0:
+                    childs[0][i] = parents[1][i]
+
+        return childs
+
+    def _nreine(self, parents):
 
         # initialization
         childs = [[0] * self.Size, [0] * self.Size]

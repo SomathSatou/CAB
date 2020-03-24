@@ -246,11 +246,11 @@ class AEPermutation:
         return childs
 
     def Pmx(self, parents):
+        childs = [[0] * self.Size, [0] * self.Size]
         if randint(0, 100) < self.RecombinationProp:
             pivot1 = randint(0, self.Size-1)
             pivot2 = randint(pivot1+1, self.Size)
 
-            childs = [[0] * self.Size, [0] * self.Size]
 
             #k prends le segment du parents 1
             for i in range(pivot1,pivot2):
@@ -275,7 +275,7 @@ class AEPermutation:
 
         return childs
 
-    def _nreine(self, parents):
+    def crossover_nreine(self, parents):
 
         # initialization
         childs = [[0] * self.Size, [0] * self.Size]
@@ -305,7 +305,23 @@ class AEPermutation:
 
         return childs
 
+    def crossover(self,parents):
+        childs = [[0] * self.Size, [0] * self.Size]
+
+        return childs
     # endregion Recombination
+
+    def edge(self,parents):
+
+        childs = [[0] * self.Size, [0] * self.Size]
+
+        return childs
+
+    def cycle(self,parents):
+        childs = [[0] * self.Size, [0] * self.Size]
+
+        return childs
+
 
     # region Mutation
     def swap(self):
@@ -345,6 +361,12 @@ class AEPermutation:
                     tmp = child[B - ((B - A) / 2)]
                     child[B - ((B - A) / 2)] = child[B - (i - A)]
                     child[B - (i - A)] = tmp
+        return
+
+    def slide(self):
+        return
+
+    def partialRandom(self):
         return
 
     # endregion Mutation

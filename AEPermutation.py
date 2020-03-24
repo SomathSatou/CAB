@@ -246,11 +246,12 @@ class AEPermutation:
         return childs
 
     def Pmx(self, parents):
+        childs = [[0] * self.Size, [0] * self.Size]
         if randint(0, 100) < self.RecombinationProp:
             pivot1 = randint(0, self.Size-1)
             pivot2 = randint(pivot1+1, self.Size)
 
-            childs = [[0] * self.Size, [0] * self.Size]
+
 
             #k prends le segment du parents 1
             for i in range(pivot1,pivot2):
@@ -275,7 +276,7 @@ class AEPermutation:
 
         return childs
 
-    def _nreine(self, parents):
+    def crossover_nreine(self, parents):
 
         # initialization
         childs = [[0] * self.Size, [0] * self.Size]
@@ -305,6 +306,37 @@ class AEPermutation:
 
         return childs
 
+    def crossover(self,parents):
+        if randint(0, 100) < self.RecombinationProp:
+            pivot1 = randint(0, self.Size - 1)
+            pivot2 = randint(pivot1 + 1, self.Size)
+
+            childs = [[0] * self.Size, [0] * self.Size]
+
+            # k prends le segment du parents 1
+            for i in range(pivot1, pivot2):
+                childs[0][i] = parents[0][i]
+
+            ajout = []
+            for i in range(0, self.Size):
+                if not childs[0].__contains__(parents[1][i]):
+                    ajout.append(i)
+
+            for i in range(self.Size, 0):
+                if childs[0][i] == 0:
+                    childs[0][i] = parents[1][ajout.pop()]
+
+        return childs
+
+    def slide(self, parents):
+        childs = [[0] * self.Size, [0] * self.Size]
+
+        return childs
+
+    def partialRandom(self, parents):
+        childs = [[0] * self.Size, [0] * self.Size]
+
+        return childs
     # endregion Recombination
 
     # region Mutation
@@ -345,6 +377,12 @@ class AEPermutation:
                     tmp = child[B - ((B - A) / 2)]
                     child[B - ((B - A) / 2)] = child[B - (i - A)]
                     child[B - (i - A)] = tmp
+        return
+
+    def edge(self):
+        return
+
+    def cycle(self):
         return
 
     # endregion Mutation

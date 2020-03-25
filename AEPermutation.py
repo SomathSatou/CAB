@@ -3,7 +3,7 @@ import heapq
 import numpy as np
 import matplotlib.pyplot as plt
 from random import *
-from output import debug
+from output import *
 
 
 class AEPermutation:
@@ -41,8 +41,9 @@ class AEPermutation:
 
         self.reinsertionType = 1
         self.reiSwitch = {
-            1: self.lessoflower,
-            2: self.elder
+            1: self.bestoflower,
+            2: self.lessoflower,
+            3: self.elder
         }
 
         self.Size = data.Size
@@ -327,6 +328,8 @@ class AEPermutation:
         best = self.ChildrenEval
         for j in range(0, self.SizePop - 1):
             if self.CurrentEval[j] < best:
+                debug('insert')
+                comment(best)
                 self.CurrentEval[j] = best
                 self.Population[j] = self.Childrens.copy()
                 self.Childrens = []
@@ -336,7 +339,7 @@ class AEPermutation:
     def lessoflower(self):
         best = self.ChildrenEval
         for j in range(0, self.SizePop - 1):
-            if self.CurrentEval[j] < best:
+            if self.CurrentEval[j] > best:
                 self.CurrentEval[j] = best
                 self.Population[j] = self.Childrens.copy()
                 self.Childrens = []

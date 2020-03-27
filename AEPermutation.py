@@ -6,6 +6,9 @@ from random import *
 from output import *
 
 
+def emptyset(ensemble):
+    return len(ensemble) == 0
+
 class AEPermutation:
     def __init__(self, data, pop, mut, rec, nbcMax):
         # region Parameters
@@ -234,7 +237,7 @@ class AEPermutation:
                     next = parents[0][i]
                     check = parents[1].index(next)
 
-                    while childs[0].__contains__(check) and childs[0].__contains__(0):
+                    while (childs[0].__contains__(check)) and (childs[0].__contains__(0)):
                         next = parents[0][check]
                         check = parents[1].index(next)
 
@@ -272,14 +275,54 @@ class AEPermutation:
             childs = parents[0]
         return childs
 
+    # a tester 
     def edge(self,parents):
+        childs = [0] * self.Size
 
-        childs = [[0] * self.Size, [0] * self.Size]
+        if randint(0, 100) < self.RecombinationProp:
 
+            #création des voisin de chaque sommets
+            voisin = [set() for i in range(0, self.Size)]
+
+            for i in range(0, self.Size):
+                for j in range(0, 2):
+                    if parents[j].index(i + 1) == 0:
+                        voisin[i].add(parents[j][self.Size - 1])
+                    else:
+                        voisin[i].add(parents[j][parents[j].index(i + 1) - 1])
+                    if parents[j].index(i + 1) == self.Size - 1:
+                        voisin[i].add(parents[j][0])
+                    else:
+                        print(parents[j].index(i + 1))
+                        voisin[i].add(parents[j][parents[j].index(i + 1) + 1])
+
+            # on séléctionne le premiè element de notre progéniture
+            first = randint(0,1)
+            x = parents[first][0]
+
+            # on le retire de notre voisinage
+            for set in voisin:
+                set.discard(x)
+
+            # choix du prochain sommets de notre progéniture
+            for i in range(0, self.Size):
+                childs[i] = x
+                if emptyset(voisin[x]) :
+                    tirage = randint(1,self.Size)
+                    while childs.__contains__(tirage):
+                        tirage = randint(1, self.Size)
+                    x = tirage
+                else:
+                    longueur = self.Size
+                    for elt in range(0, len(voisin[x])):
+                        if len(voisin[elt]) < longueur:
+                            longueur = len(voisin[elt])
+                            x = elt
         return childs
 
     def cycle(self,parents):
-        childs = [[0] * self.Size, [0] * self.Size]
+        childs = [[0] * self.Size]
+        if randint(0, 100) < self.RecombinationProp:
 
         return childs
 

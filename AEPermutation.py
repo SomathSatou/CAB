@@ -3,6 +3,7 @@ import heapq
 import numpy as np
 import matplotlib.pyplot as plt
 from random import *
+from output import *
 
 
 class AEPermutation:
@@ -13,6 +14,8 @@ class AEPermutation:
 
         self.moyY = []
         self.worstY = []
+
+        self.cab = []
 
         self.mutationType = 1
         self.mutSwitch = {
@@ -40,8 +43,9 @@ class AEPermutation:
 
         self.reinsertionType = 1
         self.reiSwitch = {
-            1: self.lessoflower,
-            2: self.elder
+            1: self.bestoflower,
+            2: self.lessoflower,
+            3: self.elder
         }
 
         self.Size = data.Size
@@ -53,6 +57,9 @@ class AEPermutation:
         self.Population = []
         self.nbCycle = 0
 
+        self.parents = []
+        self.Childrens = []
+
         for elt in range(0, self.SizePop):
             tmpIndividu = []
             for i in range(1, self.Size + 1):
@@ -61,15 +68,17 @@ class AEPermutation:
             self.Population.append(tmpIndividu)
 
         self.data = data.data
+        self.edges = data.edges
         # endregion Parameters
 
-    def launch(self, methodList, displayMoy):
+    def launch(self, methodList, displayPlot, displayMoy, displayCab, displayFitness):
 
         # 4 tab to keep probability of operator
         DataOP = []
-        nbCycle = 0
+        self.nbCycle = 0
 
         for methodElt in methodList:
+            self.nbCycle = 0
 
             self.mutationType = methodElt[0]
             self.selectionType = methodElt[1]
@@ -93,9 +102,9 @@ class AEPermutation:
             # initialisation(Size, 100, 40, 100, nbCycleMax)
 
             self.evaluate()
+            self.evaluateCab()
             while self.terminaison():
                 # selection
-
                 self.parents = select()
 
                 # Recombine
@@ -111,15 +120,16 @@ class AEPermutation:
                 reinsertion()
 
                 # graph Value
-                self.evaluate()
-                nbCycle = nbCycle + 1
-                affichage = "nombre de tour effectuer : " + str(nbCycle) + "/" + str(self.nbCycleMax)
+                #self.evaluate()
+                #self.evaluateCab()
+                self.nbCycle = self.nbCycle + 1
+                affichage = "nombre de tour effectuer : " + str(self.nbCycle) + "/" + str(self.nbCycleMax)
                 print(affichage)
-                self.x.append(nbCycle)
+                self.x.append(self.nbCycle)
                 self.y.append(self.CurrentBest())
                 self.moyY.append(np.mean(self.CurrentEval))
+                self.cab.append(max(self.CurrentEvalCab))
             print(Label)
-            #   plt.plot(x, y, label=Label)
 
             fichier = open(Label + ".txt", "a")
 
@@ -129,21 +139,29 @@ class AEPermutation:
             fichier.write("\n")
             fichier.close()
 
-            if displayMoy:
-                Label = "moy : " + Label
-                plt.plot(self.x, self.moyY, label=Label)
+            if displayFitness:
+                plt.plot(self.x, self.y, label=Label)
 
-            if mutation == self.flipsAdaptatifPursuit:
-                fichierOP = open(Label + "dataOPAPW.txt", "a")
+            if displayMoy:
+                tmp = "moy : " + Label
+                plt.plot(self.x, self.moyY, label=tmp)
+
+            if displayCab:
+                tmp = "cab : " + Label
+                plt.plot(self.x, self.cab, label=tmp)
+
+            # if mutation == flipsAdaptatifPursuit:
+            #    fichierOP = open(Label + "dataOPAPW.txt", "a")
                 # dépendant de opérateur cible , mutation recombinaison, etc ...
-                for iop in range(0, 2):
-                    for elt in DataOP:
-                        fichierOP.write(str(elt[iop]) + ";")
-                    fichierOP.write("\n")
-                fichierOP.write("\n")
-                fichierOP.close()
-        # plt.legend()
-        # plt.show()
+            #    for iop in range(0, 2):
+            #       for elt in DataOP:
+            #            fichierOP.write(str(elt[iop]) + ";")
+            #        fichierOP.write("\n")
+            #    fichierOP.write("\n")
+            #    fichierOP.close()
+        if(displayPlot):
+            plt.legend()
+            plt.show()
 
     # region Selection
     def twoBest(self):
@@ -198,51 +216,6 @@ class AEPermutation:
     # endregion Selection
 
     # region Recombination
-    def Pmx_nreine(self, parents):
-        childs = self.parents.copy()
-        indexRand = []
-        if randint(0, 100) < self.RecombinationProp:
-            while len(indexRand) < 3:
-                tmp = randint(0, self.Size - 1)
-                if not indexRand.__contains__(tmp):
-                    indexRand.append(tmp)
-            childs[0] = [0] * self.Size
-            for elt in indexRand:
-                childs[0][elt] = parents[0][elt]
-                childs[1][elt] = parents[1][elt]
-            index = 0
-            print(childs[0])
-            for i in range(0, indexRand[0] - 1):
-                while childs[0][i] == 0:
-                    if not childs.__contains__(parents[1][index]):
-                        childs[0][i] = parents[1][index]
-                        childs[1][i] = parents[0][index]
-                    index += 1
-            print(childs[0])
-            for i in range(indexRand[0] + 1, indexRand[1] - 1):
-                while childs[0][i] == 0:
-                    if not childs.__contains__(parents[1][index]):
-                        childs[0][i] = parents[1][index]
-                        childs[1][i] = parents[0][index]
-                    index += 1
-            print(childs[0])
-            for i in range(indexRand[1] + 1, indexRand[2] - 1):
-                while childs[0][i] == 0:
-                    if not childs.__contains__(parents[1][index]):
-                        childs[0][i] = parents[1][index]
-                        childs[1][i] = parents[0][index]
-                    index += 1
-            print(childs[0])
-            for i in range(indexRand[2] + 1, len(childs[0]) - 1):
-                while childs[0][i] == 0 and index == len(parents[1]):
-                    if not childs.__contains__(parents[1][index]):
-                        childs[0][i] = parents[1][index]
-                        childs[1][i] = parents[0][index]
-                    index += 1
-            print(childs[0])
-            print("rcombinaitionDone")
-        return childs
-
     def Pmx(self, parents):
         childs = [[0] * self.Size, [0] * self.Size]
         if randint(0, 100) < self.RecombinationProp:
@@ -274,69 +247,30 @@ class AEPermutation:
 
         return childs
 
-    def crossover_nreine(self, parents):
-
-        # initialization
-        childs = [[0] * self.Size, [0] * self.Size]
-        indexRand = []
-        if randint(0, 100) < self.RecombinationProp:
-            while len(indexRand) < 2:
-                tmp = randint(0, self.Size - 1)
-                if not indexRand.__contains__(tmp):
-                    indexRand.append(tmp)
-            indexRand.sort()
-
-            # preservate part
-            for i in range(indexRand[0], indexRand[1] + 1):
-                childs[0][i] = parents[0][i]
-                childs[1][i] = parents[1][i]
-
-            # keep the order in way of crossover recombination child 0 to child 1 to se preservate part
-            index = 0
-            for index in range(0, self.Size):
-                if not childs[0].__contains__(parents[1][index]):
-                    childs[0][childs[0].index(0)] = parents[1][index]
-                if not childs[1].__contains__(parents[0][index]):
-                    childs[1][childs[1].index(0)] = parents[0][index]
-
-        else:
-            childs = parents.copy()
-
-        return childs
-
-    def crossover(self,parents):
-        childs = [[0] * self.Size, [0] * self.Size]
+    def crossover(self, parents):
+        childs = [0] * self.Size
 
         if randint(0, 100) < self.RecombinationProp:
             pivot1 = randint(0, self.Size - 1)
             pivot2 = randint(pivot1 + 1, self.Size)
 
-
             # k prends le segment du parents 1
             for i in range(pivot1, pivot2):
-                childs[0][i] = parents[0][i]
+                childs[i] = parents[0][i]
 
             ajout = []
-            for i in range(0, self.Size):
-                if not childs[0].__contains__(parents[1][i]):
+            for i in range(pivot1, pivot2):
+                if not childs.__contains__(parents[1][i]):
                     ajout.append(i)
-
-            for i in range(self.Size, 0):
-                if childs[0][i] == 0:
-                    childs[0][i] = parents[1][ajout.pop()]
-
+            for i in range(0, self.Size):
+                if childs[i] == 0:
+                    if childs.__contains__(parents[1][i]):
+                        childs[i] = parents[1][ajout.pop()]
+                    else:
+                        childs[i] = parents[1][i]
+        else:
+            childs = parents[0]
         return childs
-
-    def slide(self, parents):
-        childs = [[0] * self.Size, [0] * self.Size]
-
-        return childs
-
-    def partialRandom(self, parents):
-        childs = [[0] * self.Size, [0] * self.Size]
-
-        return childs
-    # endregion Recombination
 
     def edge(self,parents):
 
@@ -349,17 +283,27 @@ class AEPermutation:
 
         return childs
 
+    # endregion Recombination
 
     # region Mutation
+
+    def slide(self, parents):
+        childs = [[0] * self.Size, [0] * self.Size]
+
+        return childs
+
+    def partialRandom(self, parents):
+        childs = [[0] * self.Size, [0] * self.Size]
+
+        return childs
+
     def swap(self):
-        childs = self.Childrens
-        for child in childs:
-            if randint(0, 100) <= self.MutationProb:
-                A = randint(0, len(child) - 2)
-                B = randint(A + 1, len(child) - 1)
-                tmp = child[A]
-                child[A] = child[B]
-                child[B] = tmp
+        if randint(0, 100) <= self.MutationProb:
+            A = randint(0, len(self.Childrens) - 2)
+            B = randint(A + 1, len(self.Childrens) - 1)
+            tmp = self.Childrens[A]
+            self.Childrens[A] = self.Childrens[B]
+            self.Childrens[B] = tmp
         return
 
     def reinsert(self):
@@ -394,30 +338,34 @@ class AEPermutation:
 
     # region Insertion
     def bestoflower(self):
-        best = self.ChildrenEval.index(max(self.ChildrenEval))
+        best = self.ChildrenEval
         for j in range(0, self.SizePop - 1):
-            if self.CurrentEval[j] < self.ChildrenEval[best]:
-                self.CurrentEval[j] = self.ChildrenEval[best]
-                self.Population[j] = self.Childrens[best].copy()
-                self.ChildrenEval = []
+            if self.CurrentEval[j] < best:
+                self.CurrentEval[j] = best
+                self.CurrentEvalCab[j] = self.CAB(self.Childrens)
+                self.Population[j] = self.Childrens.copy()
                 self.Childrens = []
                 return
         return
 
     def lessoflower(self):
-        best = self.ChildrenEval.index(max(self.ChildrenEval))
+        best = self.ChildrenEval
         for j in range(0, self.SizePop - 1):
-            if self.CurrentEval[j] > self.ChildrenEval[best]:
-                self.CurrentEval[j] = self.ChildrenEval[best]
-                self.Population[j] = self.Childrens[best].copy()
-                self.ChildrenEval = []
+            if self.CurrentEval[j] > best:
+                self.CurrentEval[j] = best
+                self.CurrentEvalCab[j] = self.CAB(self.Childrens)
+                self.Population[j] = self.Childrens.copy()
                 self.Childrens = []
                 return
         return
 
     def elder(self):
-        best = self.ChildrenEval.index(max(self.ChildrenEval))
-        self.Population.append(self.Childrens[best].copy())
+        best = self.ChildrenEval
+        self.CurrentEvalCab.append(self.CAB(self.Childrens))
+        self.CurrentEvalCab.pop(0)
+        self.CurrentEval.append(best)
+        self.CurrentEval.pop(0)
+        self.Population.append(self.Childrens.copy())
         self.Population.pop(0)
         return
 
@@ -428,6 +376,16 @@ class AEPermutation:
         self.CurrentEval = []
         for elt in self.Population:
             self.CurrentEval.append(self.fitness(elt))
+
+        #print(self.CurrentEval)
+        return
+
+    def evaluateCab(self):
+        self.CurrentEvalCab = []
+        for elt in self.Population:
+            self.CurrentEvalCab.append(self.CAB(elt))
+
+        #print(self.CurrentEvalCab)
         return
 
     def objectif(self, elt):
@@ -438,6 +396,17 @@ class AEPermutation:
 
     def fitness(self, elt):
         return self.fitness1(elt)
+
+    def CAB(self,elt):
+        cab = self.Size
+        for i in range(0,len(self.data)):
+            for j in self.data[i]:
+                if (i+1) < j:
+                    absDiff = abs((elt.index(i+1)+1) - (elt.index(j)+1))
+                    cyclicdiff = min(absDiff, self.Size - absDiff)
+                    if cyclicdiff < cab :
+                        cab = cyclicdiff
+        return cab
 
     def fillD(self, elt):
         ret = []
@@ -464,7 +433,6 @@ class AEPermutation:
         for i in range(1, self.Size//2):
 
             ret = ret + (delta * ((self.Size//2) - i + 1) * d[i-1])
-
         return ret
 
     def terminaison(self):
@@ -473,9 +441,7 @@ class AEPermutation:
         return True
 
     def evaluatechildren(self):
-        self.ChildrenEval = []
-        for elt in self.Childrens:
-            self.ChildrenEval.append(self.fitness(elt))
+        self.ChildrenEval = self.fitness(self.Childrens)
         return
 
     def CurrentBest(self):

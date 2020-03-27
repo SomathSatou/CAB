@@ -4,9 +4,9 @@ from Parser import Parser
 import numpy as np
 
 loader = Parser()
-loader.load('../Dataset/3dmeshes/3dmesh_3.txt')
+loader.load('../Dataset/Instances/hypercube11.rnd')
 
-P = 100 # taille de ma population
+P = 10 # taille de ma population
 M = 80 # probabilité de mutation
 C = 50 #probabilité de croissement
 CMax =1000 # nombre limite d'itérations pour l'algoritme

@@ -102,6 +102,7 @@ class AEPermutation:
             # initialisation(Size, 100, 40, 100, nbCycleMax)
 
             self.evaluate()
+            self.evaluateCab()
             while self.terminaison():
                 # selection
                 self.parents = select()
@@ -119,8 +120,8 @@ class AEPermutation:
                 reinsertion()
 
                 # graph Value
-                self.evaluate()
-                self.evaluateCab()
+                #self.evaluate()
+                #self.evaluateCab()
                 self.nbCycle = self.nbCycle + 1
                 affichage = "nombre de tour effectuer : " + str(self.nbCycle) + "/" + str(self.nbCycleMax)
                 print(affichage)
@@ -340,9 +341,8 @@ class AEPermutation:
         best = self.ChildrenEval
         for j in range(0, self.SizePop - 1):
             if self.CurrentEval[j] < best:
-                debug('insert')
-                comment(best)
                 self.CurrentEval[j] = best
+                self.CurrentEvalCab[j] = self.CAB(self.Childrens)
                 self.Population[j] = self.Childrens.copy()
                 self.Childrens = []
                 return
@@ -353,6 +353,7 @@ class AEPermutation:
         for j in range(0, self.SizePop - 1):
             if self.CurrentEval[j] > best:
                 self.CurrentEval[j] = best
+                self.CurrentEvalCab[j] = self.CAB(self.Childrens)
                 self.Population[j] = self.Childrens.copy()
                 self.Childrens = []
                 return
@@ -360,6 +361,10 @@ class AEPermutation:
 
     def elder(self):
         best = self.ChildrenEval
+        self.CurrentEvalCab.append(self.CAB(self.Childrens))
+        self.CurrentEvalCab.pop(0)
+        self.CurrentEval.append(best)
+        self.CurrentEval.pop(0)
         self.Population.append(self.Childrens.copy())
         self.Population.pop(0)
         return
@@ -380,7 +385,7 @@ class AEPermutation:
         for elt in self.Population:
             self.CurrentEvalCab.append(self.CAB(elt))
 
-        print(self.CurrentEvalCab)
+        #print(self.CurrentEvalCab)
         return
 
     def objectif(self, elt):
@@ -393,7 +398,6 @@ class AEPermutation:
         return self.fitness1(elt)
 
     def CAB(self,elt):
-        debug('cosfunskjfsefkuesjfisejfsliefj')
         cab = self.Size
         for i in range(0,len(self.data)):
             for j in self.data[i]:
@@ -402,8 +406,6 @@ class AEPermutation:
                     cyclicdiff = min(absDiff, self.Size - absDiff)
                     if cyclicdiff < cab :
                         cab = cyclicdiff
-
-
         return cab
 
     def fillD(self, elt):

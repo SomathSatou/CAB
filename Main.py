@@ -6,13 +6,13 @@ import numpy as np
 loader = Parser()
 loader.load('../Dataset/3dmeshes/3dmesh_3.txt')
 
-P = 10 # taille de ma population
+P = 100 # taille de ma population
 M = 80 # probabilité de mutation
 C = 50 #probabilité de croissement
 CMax =1000 # nombre limite d'itérations pour l'algoritme
 
 Seed = 9001
-for i in range(0,50):
+for i in range(0,1):
     print('debut des test pour la seed ' + str(Seed))
     np.random.seed(Seed)
     Seed = Seed+1
@@ -40,4 +40,5 @@ for i in range(0,50):
     # test
     methodList = [[1, 1, 1, 1]]
 
-    Run.launch(methodList, False)
+    #launch(self, methodList, displayPlot, displayMoy, displayCab, displayFitness)
+    Run.launch(methodList, True, False, True, False)

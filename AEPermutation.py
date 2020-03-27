@@ -15,6 +15,8 @@ class AEPermutation:
         self.moyY = []
         self.worstY = []
 
+        self.cab = []
+
         self.mutationType = 1
         self.mutSwitch = {
             1: self.swap,
@@ -66,9 +68,10 @@ class AEPermutation:
             self.Population.append(tmpIndividu)
 
         self.data = data.data
+        self.edges = data.edges
         # endregion Parameters
 
-    def launch(self, methodList, displayMoy):
+    def launch(self, methodList, displayPlot, displayMoy, displayCab, displayFitness):
 
         # 4 tab to keep probability of operator
         DataOP = []
@@ -117,14 +120,15 @@ class AEPermutation:
 
                 # graph Value
                 self.evaluate()
+                self.evaluateCab()
                 self.nbCycle = self.nbCycle + 1
                 affichage = "nombre de tour effectuer : " + str(self.nbCycle) + "/" + str(self.nbCycleMax)
                 print(affichage)
                 self.x.append(self.nbCycle)
                 self.y.append(self.CurrentBest())
                 self.moyY.append(np.mean(self.CurrentEval))
+                self.cab.append(max(self.CurrentEvalCab))
             print(Label)
-            #   plt.plot(x, y, label=Label)
 
             fichier = open(Label + ".txt", "a")
 
@@ -134,9 +138,16 @@ class AEPermutation:
             fichier.write("\n")
             fichier.close()
 
+            if displayFitness:
+                plt.plot(self.x, self.y, label=Label)
+
             if displayMoy:
-                Label = "moy : " + Label
-                plt.plot(self.x, self.moyY, label=Label)
+                tmp = "moy : " + Label
+                plt.plot(self.x, self.moyY, label=tmp)
+
+            if displayCab:
+                tmp = "cab : " + Label
+                plt.plot(self.x, self.cab, label=tmp)
 
             # if mutation == flipsAdaptatifPursuit:
             #    fichierOP = open(Label + "dataOPAPW.txt", "a")
@@ -147,8 +158,9 @@ class AEPermutation:
             #        fichierOP.write("\n")
             #    fichierOP.write("\n")
             #    fichierOP.close()
-        # plt.legend()
-        # plt.show()
+        if(displayPlot):
+            plt.legend()
+            plt.show()
 
     # region Selection
     def twoBest(self):
@@ -363,6 +375,14 @@ class AEPermutation:
         #print(self.CurrentEval)
         return
 
+    def evaluateCab(self):
+        self.CurrentEvalCab = []
+        for elt in self.Population:
+            self.CurrentEvalCab.append(self.CAB(elt))
+
+        print(self.CurrentEvalCab)
+        return
+
     def objectif(self, elt):
         global Size
         if self.fitness(elt) == 0:
@@ -371,6 +391,20 @@ class AEPermutation:
 
     def fitness(self, elt):
         return self.fitness1(elt)
+
+    def CAB(self,elt):
+        debug('cosfunskjfsefkuesjfisejfsliefj')
+        cab = self.Size
+        for i in range(0,len(self.data)):
+            for j in self.data[i]:
+                if (i+1) < j:
+                    absDiff = abs((elt.index(i+1)+1) - (elt.index(j)+1))
+                    cyclicdiff = min(absDiff, self.Size - absDiff)
+                    if cyclicdiff < cab :
+                        cab = cyclicdiff
+
+
+        return cab
 
     def fillD(self, elt):
         ret = []

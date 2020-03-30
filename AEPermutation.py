@@ -128,6 +128,7 @@ class AEPermutation:
                 self.nbCycle = self.nbCycle + 1
                 affichage = "nombre de tour effectuer : " + str(self.nbCycle) + "/" + str(self.nbCycleMax)
                 print(affichage)
+                #ajouter
                 self.x.append(self.nbCycle)
                 self.y.append(self.CurrentBest())
                 self.moyY.append(np.mean(self.CurrentEval))
@@ -219,8 +220,9 @@ class AEPermutation:
     # endregion Selection
 
     # region Recombination
+
     def Pmx(self, parents):
-        childs = [[0] * self.Size, [0] * self.Size]
+        childs = [0] * self.Size
         if randint(0, 100) < self.RecombinationProp:
             pivot1 = randint(0, self.Size-1)
             pivot2 = randint(pivot1+1, self.Size)
@@ -229,25 +231,24 @@ class AEPermutation:
 
             #k prends le segment du parents 1
             for i in range(pivot1,pivot2):
-                childs[0][i] = parents[0][i]
-
+                childs[i] = parents[0][i]
             # ajouter les elemnents du parents 2 qui ne sont pas déjç présent
             for i in range(pivot1,pivot2):
-                if not childs[0].__contains__(parents[1][i]) :
+                if not childs.__contains__(parents[1][i]) :
                     next = parents[0][i]
                     check = parents[1].index(next)
 
-                    while (childs[0].__contains__(check)) and (childs[0].__contains__(0)):
+                    while not childs[check] ==0:
                         next = parents[0][check]
                         check = parents[1].index(next)
+                    childs[check] = parents[1][i]
 
-                    childs[0][check] = parents[0][i]
-
-            #remplissage des blancs 
+            #remplissage des blancs
             for i in range(0, self.Size):
-                if childs[0][i] == 0:
-                    childs[0][i] = parents[1][i]
-
+                if childs[i] == 0:
+                    childs[i] = parents[1][i]
+        else:
+            childs = parents[0]
         return childs
 
     def crossover(self, parents):
@@ -275,13 +276,15 @@ class AEPermutation:
             childs = parents[0]
         return childs
 
-    # a tester 
+    # a tester
+    # non fonctionnel problème avec les ensembles
     def edge(self,parents):
         childs = [0] * self.Size
 
         if randint(0, 100) < self.RecombinationProp:
 
             #création des voisin de chaque sommets
+
             voisin = [set() for i in range(0, self.Size)]
 
             for i in range(0, self.Size):
@@ -318,11 +321,16 @@ class AEPermutation:
                         if len(voisin[elt]) < longueur:
                             longueur = len(voisin[elt])
                             x = elt
+
+            del voisin
+        else:
+            childs = parents[0]
         return childs
 
     def cycle(self,parents):
-        childs = [[0] * self.Size]
+        childs = [0] * self.Size
         if randint(0, 100) < self.RecombinationProp:
+            print('encore du travail')
 
         return childs
 
@@ -380,6 +388,8 @@ class AEPermutation:
     # endregion Mutation
 
     # region Insertion
+
+    # essayer d'utiliser min plutot que de parcourir pour tenter de gagner du tempt, regarder pour utiliser la recherche dicotomique
     def bestoflower(self):
         best = self.ChildrenEval
         for j in range(0, self.SizePop - 1):
@@ -418,7 +428,8 @@ class AEPermutation:
     def evaluate(self):
         self.CurrentEval = []
         for elt in self.Population:
-            self.CurrentEval.append(self.fitness(elt))
+            #self.CurrentEval.append(self.fitness(elt))
+            self.CurrentEval.append(self.CAB(elt))
 
         #print(self.CurrentEval)
         return
@@ -431,11 +442,13 @@ class AEPermutation:
         #print(self.CurrentEvalCab)
         return
 
+'''
     def objectif(self, elt):
         global Size
         if self.fitness(elt) == 0:
             return True
         return False
+'''
 
     def fitness(self, elt):
         return self.fitness1(elt)
@@ -484,7 +497,8 @@ class AEPermutation:
         return True
 
     def evaluatechildren(self):
-        self.ChildrenEval = self.fitness(self.Childrens)
+        #self.ChildrenEval = self.fitness(self.Childrens)
+        self.ChildrenEval = self.CAB(self.Childrens)
         return
 
     def CurrentBest(self):

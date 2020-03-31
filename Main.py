@@ -9,7 +9,7 @@ loader.load('../Dataset/Instances/mesh2D5x25.rnd')
 P = 100 # taille de ma population
 M = 80 # probabilité de mutation
 C = 50 #probabilité de croissement
-CMax =10000 # nombre limite d'itérations pour l'algoritme
+CMax = 5000 # nombre limite d'itérations pour l'algoritme
 
 Seed = 9001
 for i in range(0,1):
@@ -38,10 +38,13 @@ for i in range(0,1):
     # methodList = [[1, 1, 1, 1], [1, 1, 1, 2]]
 
     # test
-    methodList = [[1, 3, 2, 3]]
+    methodList = [[1, 3, 2, 1]]
 
     #launch(self, methodList, displayPlot, displayMoy, displayCab, displayFitness)
     # display F1
-    Run.launch(methodList, True, True , False, True)
-    # display
-    #Run.launch(methodList, True, False, True, False)
+    #Run.launch(methodList, True, True, False, True)
+    # display CAB
+    Run.launch(methodList, True, False, True, False)
+
+    #display all
+    #Run.launch(methodList, True, True, True, True)

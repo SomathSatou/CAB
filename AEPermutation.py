@@ -25,7 +25,8 @@ class AEPermutation:
             1: self.swap,
             2: self.flip,
             3: self.slide,
-            4: self.partialRandom
+            4: self.partialRandom,
+            5: self.bitSwap
         }
 
         self.selectionType = 4
@@ -373,6 +374,16 @@ class AEPermutation:
             self.Childrens[B] = tmp
         return
 
+    def bitSwap(self):
+        if randint(0, 100) <= self.MutationProb:
+            for A in range(0, len(self.childrens)):
+                if randint(0, 100) <= (1/self.Size):
+                    B = randint(A + 1, len(self.Childrens) - 1)
+                    tmp = self.Childrens[A]
+                    self.Childrens[A] = self.Childrens[B]
+                    self.Childrens[B] = tmp
+        return
+
     def reinsert(self):
         childs = self.Childrens
         for child in childs:
@@ -412,6 +423,7 @@ class AEPermutation:
             if self.CurrentEval[j] < best:
                 self.CurrentEval[j] = best
                 self.CurrentEvalCab[j] = self.CAB(self.Childrens)
+                #debug( self.CAB(self.Childrens))
                 self.Population[j] = self.Childrens.copy()
                 self.Childrens = []
                 return
@@ -458,13 +470,32 @@ class AEPermutation:
         #print(self.CurrentEvalCab)
         return
 
-    '''
-    def objectif(self, elt):
-        global Size
-        if self.fitness(elt) == 0:
-            return True
-        return False
-    '''
+    # à tester
+    def partialEvaluate(self, A, B, individu):
+        labelA = individu[A]
+        labelB = individu[B]
+        for elt in self.data[A]:
+            if not individu[elt] == B:
+                oldw = abs(labelA - individu[elt])
+                neww = abs(labelB - individu[elt])
+                oldcw = min(oldw, self.Size-oldw)
+                newcw = min(neww, self.Size-neww)
+                self.aux[oldcw] = self.aux[oldcw]-1
+                self.aux[newcw] = self.aux[newcw]+1
+
+        for elt in self.data[B]:
+            if not individu[elt] == A:
+                oldw = abs(labelB - individu[elt])
+                neww = abs(labelA - individu[elt])
+                oldcw = min(oldw, self.Size-oldw)
+                newcw = min(neww, self.Size-neww)
+                self.aux[oldcw] = self.aux[oldcw]-1
+                self.aux[newcw] = self.aux[newcw]+1
+        d = self.fillD(elt)
+        indice = 1
+        while d[indice] + self.aux[indice] == 0:
+            indice = indice + 1
+        return indice
 
     def fitness(self, elt):
         return self.fitness1(elt)
@@ -474,7 +505,7 @@ class AEPermutation:
         for i in range(0,len(self.data)):
             for j in self.data[i]:
                 if (i+1) < j:
-                    absDiff = abs((elt.index(i+1)+1) - (elt.index(j)+1))
+                    absDiff = abs(elt[i] - elt[j-1])
                     cyclicdiff = min(absDiff, self.Size - absDiff)
                     if cyclicdiff < cab :
                         cab = cyclicdiff
@@ -503,7 +534,6 @@ class AEPermutation:
         d = self.fillD(elt)
         ret = 0
         for i in range(1, self.Size//2):
-
             ret = ret + (delta * ((self.Size//2) - i + 1) * d[i-1])
         return ret
 

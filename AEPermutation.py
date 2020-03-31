@@ -170,7 +170,7 @@ class AEPermutation:
     # region Selection
     def twoBest(self):
         ret = []
-        best = heapq.nsmallest(2, self.CurrentEval)
+        best = heapq.nlargest(2, self.CurrentEval)
         ret.append(self.Population[self.CurrentEval.index(best[0])].copy())
         ret.append(self.Population[self.CurrentEval.index(best[1])].copy())
         return ret
@@ -189,6 +189,20 @@ class AEPermutation:
         return ret
 
     def twoBestIn5Random(self):
+        ret = []
+        indexRand = []
+        evalRand = []
+        while len(indexRand) < 5:
+            tmp = randint(0, self.SizePop - 1)
+            if not indexRand.__contains__(tmp):
+                indexRand.append(tmp)
+                evalRand.append(self.CurrentEval[tmp])
+        best = heapq.nlargest(2, evalRand)
+        ret.append(self.Population[indexRand[evalRand.index(best[0])]].copy())
+        ret.append(self.Population[indexRand[evalRand.index(best[1])]].copy())
+        return ret
+
+    def twoLowIn5Random(self):
         ret = []
         indexRand = []
         evalRand = []
@@ -284,9 +298,10 @@ class AEPermutation:
         if randint(0, 100) < self.RecombinationProp:
 
             #création des voisin de chaque sommets
-
             voisin = [set() for i in range(0, self.Size)]
 
+            debug(parents[0])
+            debug(parents[1])
             for i in range(0, self.Size):
                 for j in range(0, 2):
                     if parents[j].index(i + 1) == 0:
@@ -296,20 +311,21 @@ class AEPermutation:
                     if parents[j].index(i + 1) == self.Size - 1:
                         voisin[i].add(parents[j][0])
                     else:
-                        print(parents[j].index(i + 1))
                         voisin[i].add(parents[j][parents[j].index(i + 1) + 1])
 
+            comment(voisin)
             # on séléctionne le premiè element de notre progéniture
             first = randint(0,1)
             x = parents[first][0]
 
-            # on le retire de notre voisinage
-            for set in voisin:
-                set.discard(x)
-
             # choix du prochain sommets de notre progéniture
             for i in range(0, self.Size):
                 childs[i] = x
+
+                # on le retire de notre voisinage
+                for ensemble in voisin:
+                    ensemble.discard(x)
+
                 if emptyset(voisin[x]) :
                     tirage = randint(1,self.Size)
                     while childs.__contains__(tirage):
@@ -322,7 +338,7 @@ class AEPermutation:
                             longueur = len(voisin[elt])
                             x = elt
 
-            del voisin
+            debug(childs)
         else:
             childs = parents[0]
         return childs
@@ -428,8 +444,8 @@ class AEPermutation:
     def evaluate(self):
         self.CurrentEval = []
         for elt in self.Population:
-            #self.CurrentEval.append(self.fitness(elt))
-            self.CurrentEval.append(self.CAB(elt))
+            self.CurrentEval.append(self.fitness(elt))
+            #self.CurrentEval.append(self.CAB(elt))
 
         #print(self.CurrentEval)
         return
@@ -442,13 +458,13 @@ class AEPermutation:
         #print(self.CurrentEvalCab)
         return
 
-'''
+    '''
     def objectif(self, elt):
         global Size
         if self.fitness(elt) == 0:
             return True
         return False
-'''
+    '''
 
     def fitness(self, elt):
         return self.fitness1(elt)
@@ -497,8 +513,8 @@ class AEPermutation:
         return True
 
     def evaluatechildren(self):
-        #self.ChildrenEval = self.fitness(self.Childrens)
-        self.ChildrenEval = self.CAB(self.Childrens)
+        self.ChildrenEval = self.fitness(self.Childrens)
+        #self.ChildrenEval = self.CAB(self.Childrens)
         return
 
     def CurrentBest(self):

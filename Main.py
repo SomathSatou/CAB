@@ -38,7 +38,10 @@ for i in range(0,1):
     # methodList = [[1, 1, 1, 1], [1, 1, 1, 2]]
 
     # test
-    methodList = [[1, 3, 2, 1]]
+    methodList = [[1, 3, 2, 3]]
 
     #launch(self, methodList, displayPlot, displayMoy, displayCab, displayFitness)
-    Run.launch(methodList, True,False , True, False)
+    # display F1
+    Run.launch(methodList, True, True , False, True)
+    # display
+    #Run.launch(methodList, True, False, True, False)

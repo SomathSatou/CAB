@@ -25,7 +25,8 @@ class AEPermutation:
             1: self.swap,
             2: self.flip,
             3: self.slide,
-            4: self.partialRandom
+            4: self.partialRandom,
+            5: self.bitSwap
         }
 
         self.selectionType = 4
@@ -128,6 +129,106 @@ class AEPermutation:
                 self.nbCycle = self.nbCycle + 1
                 affichage = "nombre de tour effectuer : " + str(self.nbCycle) + "/" + str(self.nbCycleMax)
                 print(affichage)
+                #ajouter
+                self.x.append(self.nbCycle)
+                self.y.append(self.CurrentBest())
+                self.moyY.append(np.mean(self.CurrentEval))
+                self.cab.append(max(self.CurrentEvalCab))
+            print(Label)
+
+            fichier = open(Label + ".txt", "a")
+
+            for elt in self.y:
+                fichier.write(str(elt) + ";")
+
+            fichier.write("\n")
+            fichier.close()
+
+            if displayFitness:
+                plt.plot(self.x, self.y, label=Label)
+
+            if displayMoy:
+                tmp = "moy : " + Label
+                plt.plot(self.x, self.moyY, label=tmp)
+
+            if displayCab:
+                tmp = "cab : " + Label
+                plt.plot(self.x, self.cab, label=tmp)
+
+            # if mutation == flipsAdaptatifPursuit:
+            #    fichierOP = open(Label + "dataOPAPW.txt", "a")
+                # dépendant de opérateur cible , mutation recombinaison, etc ...
+            #    for iop in range(0, 2):
+            #       for elt in DataOP:
+            #            fichierOP.write(str(elt[iop]) + ";")
+            #        fichierOP.write("\n")
+            #    fichierOP.write("\n")
+            #    fichierOP.close()
+        if(displayPlot):
+            plt.legend()
+            plt.show()
+
+
+    def launch2UCB(self, displayPlot, displayMoy, displayCab, displayFitness):
+        # cette fonction as pour but de tester notre algorithme avec 2 bandit manchot, un seul les opérateur
+        # de croissement et l'autre sur les opérateur de mutations
+        # 5 list pour conserver l'évolution des opérateur de mutation
+        # 4 autre pour celle de croissement
+        crossoverOP = []
+        mutatorOP = []
+        self.nbCycle = 0
+
+        # pour l'interprétation
+        tmp = [1,1,1,1]
+        for methodElt in tmp:
+            self.nbCycle = 0
+
+            self.mutationType = methodElt[0]
+            self.selectionType = methodElt[1]
+            self.recombinationType = methodElt[2]
+            self.reinsertionType = methodElt[3]
+            Label = ""
+
+            select = self.selSwitch.get(self.selectionType, lambda: self.twoBest)
+            Label += select.__name__ + ","
+
+            recombine = self.recSwitch.get(self.recombinationType, lambda: self.crossover)
+            Label += recombine.__name__ + ","
+
+            mutation = self.mutSwitch.get(self.mutationType, lambda: self.swap)
+            Label += mutation.__name__ + ","
+
+            reinsertion = self.reiSwitch.get(self.reinsertionType, lambda: self.bestoflower)
+            Label += reinsertion.__name__ + ","
+
+            # as repenser avant
+            # initialisation(Size, 100, 40, 100, nbCycleMax)
+
+            self.evaluate()
+            self.evaluateCab()
+            while self.terminaison():
+                # selection
+                self.parents = select()
+
+                # Recombine
+                self.Childrens = recombine(self.parents)
+
+                # mutation
+                mutation()
+
+                # evaluate children
+                self.evaluatechildren()
+
+                # Reinsertion
+                reinsertion()
+
+                # graph Value
+                #self.evaluate()
+                #self.evaluateCab()
+                self.nbCycle = self.nbCycle + 1
+                affichage = "nombre de tour effectuer : " + str(self.nbCycle) + "/" + str(self.nbCycleMax)
+                print(affichage)
+                #ajouter
                 self.x.append(self.nbCycle)
                 self.y.append(self.CurrentBest())
                 self.moyY.append(np.mean(self.CurrentEval))
@@ -169,7 +270,7 @@ class AEPermutation:
     # region Selection
     def twoBest(self):
         ret = []
-        best = heapq.nsmallest(2, self.CurrentEval)
+        best = heapq.nlargest(2, self.CurrentEval)
         ret.append(self.Population[self.CurrentEval.index(best[0])].copy())
         ret.append(self.Population[self.CurrentEval.index(best[1])].copy())
         return ret
@@ -188,6 +289,20 @@ class AEPermutation:
         return ret
 
     def twoBestIn5Random(self):
+        ret = []
+        indexRand = []
+        evalRand = []
+        while len(indexRand) < 5:
+            tmp = randint(0, self.SizePop - 1)
+            if not indexRand.__contains__(tmp):
+                indexRand.append(tmp)
+                evalRand.append(self.CurrentEval[tmp])
+        best = heapq.nlargest(2, evalRand)
+        ret.append(self.Population[indexRand[evalRand.index(best[0])]].copy())
+        ret.append(self.Population[indexRand[evalRand.index(best[1])]].copy())
+        return ret
+
+    def twoLowIn5Random(self):
         ret = []
         indexRand = []
         evalRand = []
@@ -219,8 +334,9 @@ class AEPermutation:
     # endregion Selection
 
     # region Recombination
+
     def Pmx(self, parents):
-        childs = [[0] * self.Size, [0] * self.Size]
+        childs = [0] * self.Size
         if randint(0, 100) < self.RecombinationProp:
             pivot1 = randint(0, self.Size-1)
             pivot2 = randint(pivot1+1, self.Size)
@@ -229,25 +345,24 @@ class AEPermutation:
 
             #k prends le segment du parents 1
             for i in range(pivot1,pivot2):
-                childs[0][i] = parents[0][i]
-
+                childs[i] = parents[0][i]
             # ajouter les elemnents du parents 2 qui ne sont pas déjç présent
             for i in range(pivot1,pivot2):
-                if not childs[0].__contains__(parents[1][i]) :
+                if not childs.__contains__(parents[1][i]) :
                     next = parents[0][i]
                     check = parents[1].index(next)
 
-                    while (childs[0].__contains__(check)) and (childs[0].__contains__(0)):
+                    while not childs[check] ==0:
                         next = parents[0][check]
                         check = parents[1].index(next)
+                    childs[check] = parents[1][i]
 
-                    childs[0][check] = parents[0][i]
-
-            #remplissage des blancs 
+            #remplissage des blancs
             for i in range(0, self.Size):
-                if childs[0][i] == 0:
-                    childs[0][i] = parents[1][i]
-
+                if childs[i] == 0:
+                    childs[i] = parents[1][i]
+        else:
+            childs = parents[0]
         return childs
 
     def crossover(self, parents):
@@ -275,7 +390,6 @@ class AEPermutation:
             childs = parents[0]
         return childs
 
-    # a tester 
     def edge(self,parents):
         childs = [0] * self.Size
 
@@ -293,52 +407,89 @@ class AEPermutation:
                     if parents[j].index(i + 1) == self.Size - 1:
                         voisin[i].add(parents[j][0])
                     else:
-                        print(parents[j].index(i + 1))
                         voisin[i].add(parents[j][parents[j].index(i + 1) + 1])
 
             # on séléctionne le premiè element de notre progéniture
             first = randint(0,1)
             x = parents[first][0]
 
-            # on le retire de notre voisinage
-            for set in voisin:
-                set.discard(x)
 
             # choix du prochain sommets de notre progéniture
             for i in range(0, self.Size):
                 childs[i] = x
-                if emptyset(voisin[x]) :
-                    tirage = randint(1,self.Size)
-                    while childs.__contains__(tirage):
-                        tirage = randint(1, self.Size)
-                    x = tirage
-                else:
-                    longueur = self.Size
-                    for elt in range(0, len(voisin[x])):
-                        if len(voisin[elt]) < longueur:
-                            longueur = len(voisin[elt])
-                            x = elt
+                # on le retire de notre voisinage
+                for ensemble in voisin:
+                    ensemble.discard(x)
+
+                if childs.__contains__(0):
+                    if emptyset(voisin[x-1]) :
+                        tirage = randint(1,self.Size)
+                        while childs.__contains__(tirage):
+                            tirage = randint(1, self.Size)
+                        x = tirage
+                    else:
+                        longueur = self.Size
+                        for elt in voisin[x-1]:
+                            if len(voisin[elt-1]) < longueur:
+                                longueur = len(voisin[elt-1])
+                                x = elt
+
+        else:
+            childs = parents[0]
         return childs
 
     def cycle(self,parents):
-        childs = [[0] * self.Size]
+        childs = [0] * self.Size
         if randint(0, 100) < self.RecombinationProp:
-
+            ite = 0
+            while childs.__contains__(0):
+                ite = ite + 1
+                cycle = []
+                next = parents[0][childs.index(0)]
+                while not cycle.__contains__(next):
+                    cycle.append(next)
+                    next = parents[1][parents[0].index(next)]
+                if (ite % 2) == 0:
+                    for elt in cycle:
+                        childs[parents[1].index(elt)] = elt
+                else:
+                    for elt in cycle:
+                        childs[parents[0].index(elt)] = elt
+        else:
+            childs = parents[0]
         return childs
 
     # endregion Recombination
 
     # region Mutation
 
-    def slide(self, parents):
-        childs = [[0] * self.Size, [0] * self.Size]
+    def slide(self):
+        if randint(0, 100) <= self.MutationProb:
+            nbrSwap = randint(2, len(self.Childrens)//2)
+            Ltirage = []
+            last = -1
+            while len(Ltirage) < nbrSwap:
+                last = randint(last+1,len(self.Childrens)-(nbrSwap - len(Ltirage)))
+                Ltirage.append(last)
+            swapA = Ltirage.pop()
+            while len(Ltirage) > 0:
+                swapB = Ltirage.pop()
+                self.permutation(swapA,swapB)
+                swapA = swapB
+        return
 
-        return childs
+    def partialRandom(self):
+        if randint(0, 100) <= self.MutationProb:
+            A = randint(0, len(self.Childrens) - 2)
+            B = randint(A + 1, len(self.Childrens) - 1)
+            tmp = []
+            for i in range(A, B):
+                tmp.append(self.Childrens[i])
+            shuffle(tmp)
+            for i in range(A, B):
+                self.Childrens[i] = tmp[i-A]
 
-    def partialRandom(self, parents):
-        childs = [[0] * self.Size, [0] * self.Size]
-
-        return childs
+        return
 
     def swap(self):
         if randint(0, 100) <= self.MutationProb:
@@ -347,6 +498,22 @@ class AEPermutation:
             tmp = self.Childrens[A]
             self.Childrens[A] = self.Childrens[B]
             self.Childrens[B] = tmp
+        return
+
+    def permutation(self, A, B):
+        tmp = self.Childrens[A]
+        self.Childrens[A] = self.Childrens[B]
+        self.Childrens[B] = tmp
+        return
+
+    def bitSwap(self):
+        if randint(0, 100) <= self.MutationProb:
+            for A in range(0, len(self.childrens)):
+                if randint(0, 100) <= ((1/self.Size)*100):
+                    B = randint(A + 1, len(self.Childrens) - 1)
+                    tmp = self.Childrens[A]
+                    self.Childrens[A] = self.Childrens[B]
+                    self.Childrens[B] = tmp
         return
 
     def reinsert(self):
@@ -375,17 +542,21 @@ class AEPermutation:
                     tmp = child[B - ((B - A) / 2)]
                     child[B - ((B - A) / 2)] = child[B - (i - A)]
                     child[B - (i - A)] = tmp
+            self.Childrens = childs
         return
 
     # endregion Mutation
 
     # region Insertion
+
+    # essayer d'utiliser min plutot que de parcourir pour tenter de gagner du tempt, regarder pour utiliser la recherche dicotomique
     def bestoflower(self):
         best = self.ChildrenEval
         for j in range(0, self.SizePop - 1):
             if self.CurrentEval[j] < best:
                 self.CurrentEval[j] = best
                 self.CurrentEvalCab[j] = self.CAB(self.Childrens)
+                #debug( self.CAB(self.Childrens))
                 self.Population[j] = self.Childrens.copy()
                 self.Childrens = []
                 return
@@ -419,6 +590,7 @@ class AEPermutation:
         self.CurrentEval = []
         for elt in self.Population:
             self.CurrentEval.append(self.fitness(elt))
+            #self.CurrentEval.append(self.CAB(elt))
 
         #print(self.CurrentEval)
         return
@@ -431,11 +603,32 @@ class AEPermutation:
         #print(self.CurrentEvalCab)
         return
 
-    def objectif(self, elt):
-        global Size
-        if self.fitness(elt) == 0:
-            return True
-        return False
+    # à tester
+    def partialEvaluate(self, A, B, individu):
+        labelA = individu[A]
+        labelB = individu[B]
+        for elt in self.data[A]:
+            if not individu[elt] == B:
+                oldw = abs(labelA - individu[elt])
+                neww = abs(labelB - individu[elt])
+                oldcw = min(oldw, self.Size-oldw)
+                newcw = min(neww, self.Size-neww)
+                self.aux[oldcw] = self.aux[oldcw]-1
+                self.aux[newcw] = self.aux[newcw]+1
+
+        for elt in self.data[B]:
+            if not individu[elt] == A:
+                oldw = abs(labelB - individu[elt])
+                neww = abs(labelA - individu[elt])
+                oldcw = min(oldw, self.Size-oldw)
+                newcw = min(neww, self.Size-neww)
+                self.aux[oldcw] = self.aux[oldcw]-1
+                self.aux[newcw] = self.aux[newcw]+1
+        d = self.fillD(elt)
+        indice = 1
+        while self.D[indice] + self.aux[indice] == 0:
+            indice = indice + 1
+        return indice
 
     def fitness(self, elt):
         return self.fitness1(elt)
@@ -445,7 +638,7 @@ class AEPermutation:
         for i in range(0,len(self.data)):
             for j in self.data[i]:
                 if (i+1) < j:
-                    absDiff = abs((elt.index(i+1)+1) - (elt.index(j)+1))
+                    absDiff = abs(elt[i] - elt[j-1])
                     cyclicdiff = min(absDiff, self.Size - absDiff)
                     if cyclicdiff < cab :
                         cab = cyclicdiff
@@ -474,7 +667,6 @@ class AEPermutation:
         d = self.fillD(elt)
         ret = 0
         for i in range(1, self.Size//2):
-
             ret = ret + (delta * ((self.Size//2) - i + 1) * d[i-1])
         return ret
 
@@ -485,6 +677,7 @@ class AEPermutation:
 
     def evaluatechildren(self):
         self.ChildrenEval = self.fitness(self.Childrens)
+        #self.ChildrenEval = self.CAB(self.Childrens)
         return
 
     def CurrentBest(self):

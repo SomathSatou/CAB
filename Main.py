@@ -4,12 +4,15 @@ from Parser import Parser
 import numpy as np
 
 loader = Parser()
-loader.load('../Dataset/3dmeshes/3dmesh_3.txt')
+#big instance
+#loader.load('../Dataset/Instances/hypercube11.rnd')
+#test instance
+loader.load('../Dataset/Instances/mesh2D5x25.rnd')
 
 P = 100 # taille de ma population
 M = 80 # probabilité de mutation
 C = 50 #probabilité de croissement
-CMax = 10000 # nombre limite d'itérations pour l'algoritme
+CMax = 1000 # nombre limite d'itérations pour l'algoritme
 
 Seed = 9001
 for i in range(0,1):
@@ -38,13 +41,27 @@ for i in range(0,1):
     # methodList = [[1, 1, 1, 1], [1, 1, 1, 2]]
 
     # test
-    methodList = [[4, 3, 4, 1]]
+    methodList = [[1, 4, 4, 5]]
 
     #launch(self, methodList, displayPlot, displayMoy, displayCab, displayFitness)
     # display F1
-    Run.launch(methodList, True, True, False, True)
+    #Run.launch(methodList, True, True, False, True)
     # display CAB
     #Run.launch(methodList, True, False, True, False)
 
     #display all
     #Run.launch(methodList, True, True, True, True)
+
+
+    # Test UCB
+    # affiche les coubes de fitness
+    #Run.launch2UCB(True, True, False, True, False, False, False, True)
+    Run.launch2UCB(True, True, False, False, False, False, False, True)
+
+    # affiche les courbes d'utilité des opérateeur
+    # display cab
+    #Run.launch2UCB(True, False, True, False, False, False, False, True)
+    #Run.launch2UCB(True, True, False, True, False, False, False, True)
+
+    #not F1
+    #Run.launch2UCB(True, False, True, False, False, False, False)

@@ -1,4 +1,5 @@
 from output import *
+import time
 
 class Parser:
     def __init__(self):
@@ -10,6 +11,7 @@ class Parser:
         return
 
     def load(self, path):
+        start_time = time.time()
         content = []
         with open(path) as f:
             content = f.readlines()
@@ -30,5 +32,5 @@ class Parser:
                 self.data[int(line[0])-1].append(int(line[1]))
                 self.data[int(line[1])-1].append(int(line[0]))
 
-            print('loading complete')
+            print("loading complete in %s seconds" % (time.time() - start_time ))
         return

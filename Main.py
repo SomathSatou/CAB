@@ -12,7 +12,7 @@ loader.load('../Dataset/Instances/mesh2D5x25.rnd')
 P = 100 # taille de ma population
 M = 80 # probabilité de mutation
 C = 50 #probabilité de croissement
-CMax = 100 # nombre limite d'itérations pour l'algoritme
+CMax = 1000 # nombre limite d'itérations pour l'algoritme
 
 Seed = 9001
 for i in range(0,1):
@@ -41,7 +41,7 @@ for i in range(0,1):
     # methodList = [[1, 1, 1, 1], [1, 1, 1, 2]]
 
     # test
-    methodList = [[4, 3, 2, 3]]
+    methodList = [[1, 4, 4, 5]]
 
     #launch(self, methodList, displayPlot, displayMoy, displayCab, displayFitness)
     # display F1
@@ -55,11 +55,13 @@ for i in range(0,1):
 
     # Test UCB
     # affiche les coubes de fitness
-    #Run.launch2UCB(True, True, False, True, False, False)
-    # affiche les courbes d'utilité des opérateurInstances//home/etudiant/Bureau/CyclicBandwith/DInstances//home/etudiant/Bureau/CyclicBandwith/Dataset/ataset/
-    #
+    #Run.launch2UCB(True, True, False, True, False, False, False, True)
+    Run.launch2UCB(True, True, False, False, False, False, False, True)
+
+    # affiche les courbes d'utilité des opérateeur
+    # display cab
     #Run.launch2UCB(True, False, True, False, False, False, False, True)
-    Run.launch2UCB(True, True, False, True, False, False, False, True)
+    #Run.launch2UCB(True, True, False, True, False, False, False, True)
 
     #not F1
     #Run.launch2UCB(True, False, True, False, False, False, False)

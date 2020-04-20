@@ -56,6 +56,7 @@ class Individu:
         child.label = [0]*size
         child.fitness = 0
         child.cab = 0
+        child.weightCount = [0] * ((size//2)+1)
         return child
 
     def copyIndividu(self):
@@ -63,6 +64,7 @@ class Individu:
         copy.label = self.label.copy()
         copy.cab = self.cab
         copy.fitness = self.fitness
+        copy.weightCount = self.weightCount
         return copy
 
 
@@ -133,7 +135,7 @@ class AEPermutation:
 
         self.Population = [Individu(self.Size) for i in range(0, self.SizePop)]
 
-        self.UCB_mutator = UCB(5)
+        self.UCB_mutator = UCB(6)
         self.UCB_crossover = UCB(4)
 
         self.quickEval = []
@@ -144,7 +146,10 @@ class AEPermutation:
         # endregion Parameters
 
 
-    def launch(self, methodList, displayPlot, displayMoy, displayCab, displayFitness):
+    def launch(self, methodList, displayMoy, displayCab, displayFitness,
+               displayMutator, displayCrossover, minimize):
+
+        self.minimize = minimize
 
         self.nbCycle = 0
 
@@ -173,13 +178,12 @@ class AEPermutation:
             # initialisation(Size, 100, 40, 100, nbCycleMax)
 
             # partie ou on rempli
-            minimize = True
             if minimize:
                 delta = 0
                 for elt in self.data:
                     if len(elt) > delta:
                         delta = len(elt)
-                for i in range(1, (self.Size // 2)+1):
+                for i in range(0, (self.Size // 2) + 1):
                     self.quickEval.append(delta * ((self.Size // 2) - i + 1))
             else:
                 comment('il faut implémenter F3 avant')
@@ -214,41 +218,53 @@ class AEPermutation:
                     self.y.append(self.Population[self.CurrentBest()].fitness)
 
                 self.moyY.append(self.mean())
-                # self.cab.append(self.Population[self.CurrentBest()].cab)
+                self.cab.append(self.Population[self.CurrentBest()].cab)
 
-            print(Label)
+        print(Label)
 
-            fichier = open(Label + ".txt", "a")
+        fichier = open(Label + ".txt", "a")
 
-            for elt in self.y:
-                fichier.write(str(elt) + ";")
+        for elt in self.y:
+            fichier.write(str(elt) + ";")
 
-            fichier.write("\n")
-            fichier.close()
+        fichier.write("\n")
+        fichier.close()
 
-            if displayFitness:
-                plt.plot(self.x, self.y, label=Label)
+        if displayFitness:
+            plt.plot(self.x, self.y, label=Label)
 
-            if displayMoy:
-                tmp = "moy : " + Label
-                plt.plot(self.x, self.moyY, label=tmp)
+        if displayMoy:
+            tmp = "moy : " + Label
+            plt.plot(self.x, self.moyY, label=tmp)
 
-            if displayCab:
-                tmp = "cab : " + Label
-                plt.plot(self.x, self.cab, label=tmp)
-
-            # if mutation == flipsAdaptatifPursuit:
-            #    fichierOP = open(Label + "dataOPAPW.txt", "a")
-            # dépendant de opérateur cible , mutation recombinaison, etc ...
-            #    for iop in range(0, 2):
-            #       for elt in DataOP:
-            #            fichierOP.write(str(elt[iop]) + ";")
-            #        fichierOP.write("\n")
-            #    fichierOP.write("\n")
-            #    fichierOP.close()
-        if (displayPlot):
+        if displayFitness or displayMoy:
             plt.legend()
             plt.show()
+            plt.clf()
+
+        if displayCab:
+            tmp = "cab : " + Label
+            plt.plot(self.x, self.cab, label=tmp)
+            plt.legend()
+            plt.show()
+            plt.clf()
+
+        if displayMutator:
+            for i in range(0, self.UCB_mutator.NbrOP):
+                title = self.mutSwitch.get(i + 1, lambda: self.crossoverUCB).__name__
+                plt.plot(self.x, self.UCB_mutator.output[i], label=title)
+            plt.legend()
+            plt.show()
+            plt.clf()
+
+        if displayCrossover:
+            for i in range(0, self.UCB_crossover.NbrOP):
+                title = self.recSwitch.get(i + 1, lambda: self.mutatorUCB).__name__
+                plt.plot(self.x, self.UCB_crossover.output[i], label=title)
+            plt.legend()
+            plt.show()
+            plt.clf()
+
 
     def launch2UCB(self, displayPlot, displayMoy, displayCab, displayFitness,
                    displayMutator, displayCrossover, displayOP, minimize):
@@ -259,7 +275,7 @@ class AEPermutation:
         self.minimize = minimize
         self.nbCycle = 0
 
-        self.mutationType = 6
+        self.mutationType = 7
         self.recombinationType = 5
         if minimize:
             self.reinsertionType = 5
@@ -282,7 +298,7 @@ class AEPermutation:
         Label += reinsertion.__name__ + ","
 
         # valeur de debug
-        #last = 0
+        # last = 0
 
         # partie ou on rempli quickEval
         if minimize:
@@ -351,22 +367,23 @@ class AEPermutation:
 
         if displayMutator:
             for i in range (0, self.UCB_mutator.NbrOP):
-                title = self.mutSwitch.get(i-1, lambda: self.crossoverUCB).__name__
+                title = self.mutSwitch.get(i+1, lambda: self.crossoverUCB).__name__
                 plt.plot(self.x, self.UCB_mutator.output[i], label=title)
 
         if displayCrossover:
             for i in range (0, self.UCB_crossover.NbrOP):
-                title = self.recSwitch.get(i-1, lambda: self.mutatorUCB).__name__
+                title = self.recSwitch.get(i+1, lambda: self.mutatorUCB).__name__
                 plt.plot(self.x, self.UCB_crossover.output[i], label=title)
 
         if displayOP:
-            for i in range(0, self.UCB_mutator.NbrOP):
-                title = self.mutSwitch.get(i - 1, lambda: self.crossoverUCB).__name__
+            for i in range(1, self.UCB_mutator.NbrOP):
+                title = self.mutSwitch.get(i+1, lambda: self.mutatorUCB).__name__
                 plt.plot(self.x, self.UCB_mutator.utilisation[i], label=title)
 
-            for i in range (0, self.UCB_crossover.NbrOP):
-                title = self.recSwitch.get(i-1, lambda: self.mutatorUCB).__name__
+            for i in range (1, self.UCB_crossover.NbrOP):
+                title = self.recSwitch.get(i+1, lambda: self.crossoverUCB).__name__
                 plt.plot(self.x, self.UCB_crossover.utilisation[i], label=title)
+
 
 
         # if mutation == flipsAdaptatifPursuit:
@@ -582,7 +599,7 @@ class AEPermutation:
         if randint(0, 100) < self.RecombinationProp:
             meanParentsEval = (parents[0].fitness + parents[1].fitness) / 2
 
-            mutation_selected = 1
+            crossover_selected = 0
             max_upper_bound = 0
 
             for i in range(0, self.UCB_crossover.NbrOP):
@@ -594,13 +611,15 @@ class AEPermutation:
                     upper_bound = 1e400
                 if upper_bound > max_upper_bound:
                     max_upper_bound = upper_bound
-                    mutation_selected = i
-            self.UCB_crossover.numbers_of_mutation[mutation_selected] += 1
-            tmp = self.recSwitch.get(mutation_selected + 1, lambda: self.crossover())
-
+                    crossover_selected = i
+            self.UCB_crossover.numbers_of_mutation[crossover_selected] += 1
+            tmp = self.recSwitch.get(crossover_selected + 1, lambda: self.crossover())
             childs = tmp(parents)
             reward = self.fitness(childs) - meanParentsEval
-            self.UCB_crossover.sums_of_reward[mutation_selected] += reward
+            if self.minimize:
+                self.UCB_crossover.sums_of_reward[crossover_selected] -= reward
+            else:
+                self.UCB_crossover.sums_of_reward[crossover_selected] += reward
         for i in range(0,self.UCB_crossover.NbrOP):
             self.UCB_crossover.output[i].append(
                 self.UCB_crossover.sums_of_reward[i] / (self.UCB_crossover.numbers_of_mutation[i]+1)
@@ -696,6 +715,7 @@ class AEPermutation:
 
     # region local research
     def localSearchNaivePermutation(self):
+        comment(self.Childrens.fitness)
         if randint(0, 100) <= self.MutationProb:
             for i in range(0, len(self.Childrens.label)-2):
                 B = randint(i+1, len(self.Childrens.label)-1)
@@ -708,6 +728,8 @@ class AEPermutation:
                     if(tmp.fitness > self.Childrens.fitness):
                         self.permutation(i,B)
                         self.updateWeightCounts(self.Childrens)
+        comment(self.Childrens.fitness)
+
         return
     # endregion local research
 
@@ -716,7 +738,7 @@ class AEPermutation:
             self.evaluatechildren()
             OldChildrenEval = self.Childrens.fitness
 
-            mutation_selected = 1
+            mutation_selected = 0
             max_upper_bound = 0
 
             for i in range(0, self.UCB_mutator.NbrOP):
@@ -731,11 +753,14 @@ class AEPermutation:
                     mutation_selected = i
             self.UCB_mutator.numbers_of_mutation[mutation_selected] += 1
             mutator = self.mutSwitch.get(mutation_selected + 1, lambda: self.swap)
-
             mutator()
+
             self.evaluatechildren()
             reward = self.Childrens.fitness - OldChildrenEval
-            self.UCB_mutator.sums_of_reward[mutation_selected] += reward
+            if self.minimize:
+                self.UCB_mutator.sums_of_reward[mutation_selected] -= reward
+            else:
+                self.UCB_mutator.sums_of_reward[mutation_selected] += reward
         for i in range(0,self.UCB_mutator.NbrOP):
             self.UCB_mutator.output[i].append(
                 self.UCB_mutator.sums_of_reward[i] / (self.UCB_mutator.numbers_of_mutation[i]+1)
@@ -853,6 +878,7 @@ class AEPermutation:
                 if (i + 1) < j:
                     absDiff = abs(elt[i] - elt[j - 1])
                     cyclicdiff = min(absDiff, self.Size - absDiff)
+                    elt.weightCount[cyclicdiff] = elt.weightCount[cyclicdiff] +1
                     if cyclicdiff < cab:
                         cab = cyclicdiff
         return cab
@@ -881,9 +907,8 @@ class AEPermutation:
         return True
 
     def evaluatechildren(self):
-        if self.Childrens.fitness == 0:
-            self.Childrens.fitness = self.fitness(self.Childrens)
-            self.Childrens.cab = self.CAB(self.Childrens)
+        self.Childrens.fitness = self.fitness(self.Childrens)
+        self.Childrens.cab = self.CAB(self.Childrens)
         return
 
     def CurrentBest(self):

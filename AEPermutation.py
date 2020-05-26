@@ -154,6 +154,8 @@ class AEPermutation:
         }
         self.functionEval = self.fitSwitch.get(self.fitnessType, lambda: self.fitness1)
 
+        self.Best = Individu(0)
+
 
     def launch(self, methodList, displayMoy, displayCab, displayFitness,
                displayMutator, displayCrossover):
@@ -224,8 +226,16 @@ class AEPermutation:
                 # evaluate children
                 self.evaluatechildren()
 
-                # Reinsertion
+                # Reinsertion c
                 reinsertion()
+
+                # Save best Solution
+                if self.minimize:
+                    if (self.Best.fitness > self.Population[self.CurrentLow()].fitness) and (self.Best.cab < self.Population[self.CurrentLow()].cab):
+                        self.Best = self.Population[self.CurrentLow()].copyIndividu()
+                else:
+                    if (self.Best.fitness < self.Population[self.CurrentBest()].fitness) and (self.Best.cab < self.Population[self.CurrentBest()].cab):
+                        self.Best = self.Population[self.CurrentBest()].copyIndividu()
 
                 # graph Value
                 self.nbCycle = self.nbCycle + 1
@@ -258,6 +268,9 @@ class AEPermutation:
             plt.plot(self.x, self.moyY, label=tmp)
 
         if displayFitness or displayMoy:
+            plt.ylabel("Valeur de la function d'évaluation")
+            plt.xlabel("Nombre d'itération")
+
             plt.legend()
             plt.show()
             plt.clf()
@@ -265,6 +278,8 @@ class AEPermutation:
         if displayCab:
             tmp = "cab : " + Label
             plt.plot(self.x, self.cab, label=tmp)
+            plt.ylabel("Ciclyc antibanwitdh")
+            plt.xlabel("Nombre d'itération")
             plt.legend()
             plt.show()
             plt.clf()
@@ -273,6 +288,10 @@ class AEPermutation:
             for i in range(0, self.UCB_mutator.NbrOP):
                 title = self.mutSwitch.get(i + 1, lambda: self.crossoverUCB).__name__
                 plt.plot(self.x, self.UCB_mutator.output[i], label=title)
+
+            plt.ylabel("Valeur moyenne de récompense pour l'opérateur")
+            plt.xlabel("Nombre d'itération")
+
             plt.legend()
             plt.show()
             plt.clf()
@@ -281,9 +300,16 @@ class AEPermutation:
             for i in range(0, self.UCB_crossover.NbrOP):
                 title = self.recSwitch.get(i + 1, lambda: self.mutatorUCB).__name__
                 plt.plot(self.x, self.UCB_crossover.output[i], label=title)
+
+            plt.ylabel("Valeur moyenne de récompense pour l'opérateur")
+            plt.xlabel("Nombre d'itération")
+
             plt.legend()
             plt.show()
             plt.clf()
+
+        print("La meilleur solution que l'algorithme as trouvé est :\n\t" + str(self.Best.label))
+        print("elle as un cab = "+ str(self.Best.cab))
 
 
     def launch2UCB(self, displayPlot, displayMoy, displayCab, displayFitness,
@@ -331,9 +357,8 @@ class AEPermutation:
         elif self.functionEval.__name__ == "fitness2":
             for i in range(0, (self.Size // 2)+1):
                 self.quickEval.append(1/(self.Size*pow(2,i)))
-        elif self.functionEval.__name__ == "fitness2":
-            for i in range(0, (self.Size // 2)+1):
-                self.quickEval.append(0)
+        elif self.functionEval.__name__ == "fitness3":
+            self.quickEval = [0] * ((self.Size//2)+1)
 
         self.evaluate()
         while self.terminaison():
@@ -380,6 +405,9 @@ class AEPermutation:
 
         if displayFitness:
             plt.plot(self.x, self.y, label=Label)
+            plt.ylabel("Function d'évaluation")
+            plt.xlavel("Nombre d'itération")
+
 
         if displayMoy:
             tmp = "moy : " + Label
@@ -860,7 +888,6 @@ class AEPermutation:
         individu.cab = self.CAB(individu)
         return
 
-    # à tester
     def partialEvaluate(self, A, B, individu):
         tmp = individu.copyIndividu()
         labelA = individu[A]
@@ -875,11 +902,13 @@ class AEPermutation:
                 self.aux[newcw] = self.aux[newcw] + 1
                 self.affected.append(oldcw);
                 self.affected.append(newcw);
+                comment(str(tmp.fitness)+" + " + str(self.quickEval[newcw]) + " - " + str(self.quickEval[oldcw]))
                 tmp.fitness = tmp.fitness + self.quickEval[newcw] - self.quickEval[oldcw]
-                #comment(str(tmp.fitness)+" + " + str(self.quickEval[newcw]) + " - " + str(self.quickEval[oldcw]))
+                #comment("result = "+str(tmp.fitness))
+
 
         for elt in self.data[B]:
-            if not individu[-1] == A:
+            if not individu[elt-1] == A:
                 oldw = abs(labelB - individu[elt-1])
                 neww = abs(labelA - individu[elt-1])
                 oldcw = min(oldw, self.Size - oldw)
@@ -888,13 +917,19 @@ class AEPermutation:
                 self.aux[newcw] = self.aux[newcw] + 1
                 self.affected.append(oldcw);
                 self.affected.append(newcw);
+                debug(str(tmp.fitness)+" + " + str(self.quickEval[newcw]) + " - " + str(self.quickEval[oldcw]))
                 tmp.fitness = tmp.fitness + self.quickEval[newcw] - self.quickEval[oldcw]
+                #debug("result = "+str(tmp.fitness))
 
         d = self.fillD(tmp)
         indice = 1
+        if self.functionEval.__name__ != "fitness1":
+            tmp.fitness -= tmp.cab
         while d[indice] + self.aux[indice] == 0:
             indice = indice + 1
         tmp.cab = indice
+        if self.functionEval.__name__ != "fitness1":
+            tmp.fitness += tmp.cab
         return tmp
 
     def updateWeightCounts(self, individu):
@@ -938,6 +973,7 @@ class AEPermutation:
 
         ret = 0
         for i in range(1, (self.Size // 2)+2):
+
             ret = ret + (self.quickEval[i-1] * d[i - 1])
         return ret
 
@@ -946,11 +982,27 @@ class AEPermutation:
         ret = self.CAB(elt)
         for i in range(1, (self.Size // 2)+1):
             ret += self.quickEval[i-1] * d[i-1]
+        return ret
 
+    def numE(self, elt):
+        elt.cab = self.CAB(elt)
+        ret = 0
+        for A in range(0, len(self.data)):
+            if len(self.data[A]) != 0:
+                for B in range(0, len(self.data[A])):
+                    absDiff = abs(elt[A] - elt[B])
+                    cyclicdiff = min(absDiff, self.Size - absDiff)
+                    if cyclicdiff == elt.cab:
+                        ret += 1
         return ret
 
     def fitness3(self, elt):
-        ret = 0
+        ret = self.CAB(elt)
+        card = 0
+        for A in range(0, len(self.data)):
+            if len(self.data[A]) != 0:
+                card += len(self.data[A])
+        ret += self.numE(elt)/card
         return ret
 
     def terminaison(self):

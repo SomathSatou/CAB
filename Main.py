@@ -53,6 +53,7 @@ def help():
           "\tmean fitness, display cab graph, diplay fitness graph, "
           "diplay graph of opérator of mutation, same for crossover"
           )
+    print("\t-t ,--test : for test function in algorithm, usage be detailled later when implementation is over")
     print("\nArgument not set take a default value, the example below show default value\n"
           "example : <Python interpretor> Main.py -p 100 -m 80 -c 50 -i 1000 -f \"Dataset/Instances/mesh2D5x25.rnd\" -l \"1,4,4,5,2\" -d  \"1,0,1,0,0\"\n")
 
@@ -76,10 +77,10 @@ displayCrossover = True
 file = '../Dataset/Instances/caterpillar16.rnd'
 
 #[mutation, selection, crossover, reinsertion, fintness]
-methodList = [[7, 3, 5, 4, 2]]
+methodList = [[7, 3, 5, 4, 4]]
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "hp:m:c:i:f:l:d:s:vt", ["help",
+    opts, args = getopt.getopt(sys.argv[1:], "hp:m:c:i:f:l:d:s:vt:", ["help",
                                                            "population=",
                                                            "mutation=",
                                                            "crossover=",
@@ -88,7 +89,8 @@ try:
                                                            "methodList=",
                                                            "displayList=",
                                                            "seed=",
-                                                           "test"
+                                                           "verbose",
+                                                           "test="
                                                            ])
 except getopt.GetoptError as err:
     # print help information and exit:
@@ -144,7 +146,7 @@ for o, a in opts:
     elif o in ("-s", "--seed"):
         seedMax = int(a)
     elif o in ("-t", "--test"):
-        testFitness(2)
+        testFitness(int(a))
         #testCab()
         exit(0)
     else:

@@ -7,11 +7,12 @@ import time
 
 from output import *
 
-
+# function for test if a set is empty
 def emptyset(ensemble):
     return len(ensemble) == 0
 
 class UCB:
+    # class for Method who use UCB method and for display state and value of opérator
     def __init__(self, NbrOP):
         self.NbrOP = NbrOP
         self.sums_of_reward = [0] * self.NbrOP
@@ -27,6 +28,7 @@ class UCB:
             self.utilisation.append(tmp)
 
 class Individu:
+    # class for each solution in Population
     def __init__(self, size):
         self.label = []
         for i in range(1, size + 1):
@@ -36,21 +38,28 @@ class Individu:
         self.fitness = 0.0
         self.weightCount = [0] * ((size//2)+1)
 
+    # surchage of opérator setitem for treat individu like a simple array
     def __setitem__(self, indice, new):
         self.label[indice] = new
 
+    # same thing for getitem
     def __getitem__(self, indice):
         return self.label[indice]
 
+    # method for test if individu contain some item
+    # using for make sure all solution is complete and keep every label
     def __contains__(self, item):
         return self.label.__contains__(item)
 
     def __len__(self):
         return len(self.label)
 
+    # return the position of a labal "ind"
     def index(self, ind):
         return self.label.index(ind)
 
+    # create a empty solution with specific size
+    # using for initialize child or temporary Individu
     def child(self, size):
         child = Individu(size)
         child.label = [0]*size
@@ -59,6 +68,8 @@ class Individu:
         child.weightCount = [0] * ((size//2)+1)
         return child
 
+    # create a copy of the target individu
+    # using for try some swap in local research
     def copyIndividu(self):
         copy = Individu(len(self.label))
         copy.label = self.label.copy()
@@ -70,17 +81,27 @@ class Individu:
 
 
 class AEPermutation:
-
+    # its the controler in this algorithm
     def __init__(self, data, pop, mut, rec, nbcMax):
+        # method for initialize data structure
+
         # region Parameters
+        # number of offspring for plot
         self.x = []
+        # store best fitness evalution for each offspring
         self.y = []
 
+        # store mean fitness of each offspring
         self.moyY = []
+        # store worst fitness of each offspring
+        # not use it anymore
         self.worstY = []
 
+        # store best CAB evalution for each offspring
         self.cab = []
 
+        # switch of lambda function for change method without rewrite code
+        # for mutation operator
         self.mutationType = 1
         self.mutSwitch = {
             1: self.swap,
@@ -92,6 +113,7 @@ class AEPermutation:
             7: self.mutatorUCB
         }
 
+        # for selection operator
         self.selectionType = 4
         self.selSwitch = {
             1: self.twoBest,
@@ -101,6 +123,7 @@ class AEPermutation:
             5: self.wheel
         }
 
+        # for crossover operator
         self.recombinationType = 1
         self.recSwitch = {
             1: self.crossover,
@@ -110,6 +133,7 @@ class AEPermutation:
             5: self.crossoverUCB
         }
 
+        # for insertion operator
         self.reinsertionType = 1
         self.reiSwitch = {
             1: self.bestoflower,
@@ -119,32 +143,40 @@ class AEPermutation:
             5: self.best
         }
 
+        # setting of parameters for instance give in paramters
         self.Size = data.Size
         self.SizePop = pop
         self.MutationProb = mut
         self.RecombinationProp = rec
         self.nbCycleMax = nbcMax
 
+        # initialize the count of cycle/offspring
         self.nbCycle = 0
 
+        # initialize of datastruct for selected parents and store child
         self.parents = []
         self.Childrens = Individu(self.Size)
 
         self.data = data.data
         self.edges = data.edges
 
+        # initialize data structure for population
         self.Population = [Individu(self.Size) for i in range(0, self.SizePop)]
 
+        # initialize datastructure for UCB method
+        # see class UCB for more info
         self.UCB_mutator = UCB(6)
         self.UCB_crossover = UCB(4)
 
+        # initialize data struc for partial evaluation
         self.quickEval = []
         self.aux = [0] * ((self.Size//2)+1)
         self.affected = []
 
-        self.minimize = True
+        # self.minimize = True
         # endregion Parameters
 
+        # switch of lambda function for evaluation function
         self.fitnessType = 2
         self.fitSwitch = {
             1 : self.CAB,
@@ -154,17 +186,19 @@ class AEPermutation:
         }
         self.functionEval = self.fitSwitch.get(self.fitnessType, lambda: self.fitness1)
 
+        # initialise data struc for best solution
         self.Best = Individu(0)
 
 
     def launch(self, methodList, displayMoy, displayCab, displayFitness,
                displayMutator, displayCrossover):
+        # execute genetic algorithm
 
-        self.nbCycle = 0
-
+        # this for is for test many couple of operator with same seed
         for methodElt in methodList:
             self.nbCycle = 0
 
+            # part for choose requiere operator
             self.mutationType = methodElt[0]
             self.selectionType = methodElt[1]
             self.recombinationType = methodElt[2]
@@ -187,10 +221,7 @@ class AEPermutation:
             self.functionEval = self.fitSwitch.get(self.fitnessType, lambda: self.fitness1)
             Label += self.functionEval.__name__
 
-            # as repenser avant
-            # initialisation(Size, 100, 40, 100, nbCycleMax)
-
-            # partie ou on rempli
+            # set correct value for quickEval and minimize
             if self.functionEval.__name__ == "CAB":
                 self.minimize = False
                 self.quickEval = [0] * (self.Size+1 // 2)
@@ -211,8 +242,11 @@ class AEPermutation:
                 for i in range(0, (self.Size // 2) + 1):
                     self.quickEval.append(0)
 
+            # evaluate initial population
             self.evaluate()
-            #self.evaluateCab()
+
+            # end case when number of cycle max it's reach
+            # can be improve if we know optimal solution
             while self.terminaison():
                 # selection
                 self.parents = select()
@@ -226,7 +260,7 @@ class AEPermutation:
                 # evaluate children
                 self.evaluatechildren()
 
-                # Reinsertion c
+                # Reinsertion
                 reinsertion()
 
                 # Save best Solution
@@ -252,6 +286,7 @@ class AEPermutation:
 
         print(Label)
 
+        # part for write result in file
         fichier = open(Label + ".txt", "a")
 
         for elt in self.y:
@@ -260,6 +295,7 @@ class AEPermutation:
         fichier.write("\n")
         fichier.close()
 
+        # part for diplay
         if displayFitness:
             plt.plot(self.x, self.y, label=Label)
 
@@ -311,13 +347,14 @@ class AEPermutation:
         print("La meilleur solution que l'algorithme as trouvé est :\n\t" + str(self.Best.label))
         print("elle as un cab = "+ str(self.Best.cab))
 
-
+    # this method is method use past for some test not use it
     def launch2UCB(self, displayPlot, displayMoy, displayCab, displayFitness,
                    displayMutator, displayCrossover, displayOP, minimize):
         # cette fonction as pour but de tester notre algorithme avec 2 bandit manchot, un seul les opérateur
         # de croissement et l'autre sur les opérateur de mutations
         # 5 list pour conserver l'évolution des opérateur de mutation
         # 4 autre pour celle de croissement
+        # !!!!!!!!!!!!!!  not use anymore   !!!!!!!!!!!!!!
         self.nbCycle = 0
 
         self.mutationType = 7
@@ -666,10 +703,10 @@ class AEPermutation:
                     crossover_selected = i
             self.UCB_crossover.numbers_of_mutation[crossover_selected] += 1
             tmp = self.recSwitch.get(crossover_selected + 1, lambda: self.crossover())
-            comment(tmp.__name__)
+            #comment(tmp.__name__)
             childs = tmp(parents)
             reward = self.fitness(childs) - meanParentsEval
-            comment('crossover reward = '+ str(reward))
+            #comment('crossover reward = '+ str(reward))
             if self.minimize:
                 self.UCB_crossover.sums_of_reward[crossover_selected] -= reward
             else:
@@ -812,12 +849,12 @@ class AEPermutation:
         self.UCB_mutator.numbers_of_mutation[mutation_selected] += 1
         mutator = self.mutSwitch.get(mutation_selected + 1, lambda: self.swap)
 
-        debug(mutator.__name__)
+        #debug(mutator.__name__)
         mutator()
 
         self.evaluatechildren()
         reward = self.Childrens.fitness - OldChildrenEval
-        debug('mutator reward = '+ str(reward))
+        #debug('mutator reward = '+ str(reward))
 
         if self.minimize:
             self.UCB_mutator.sums_of_reward[mutation_selected] -= reward
@@ -872,6 +909,8 @@ class AEPermutation:
     # endregion Insertion
 
     # region function of algo
+
+    # method for evaluate a Population of Individu
     def evaluate(self):
         start_time = time.time()
         individual_time = []
@@ -883,11 +922,14 @@ class AEPermutation:
         print("evaluation complete in %d minute %s seconds with  %s second mean per individual"% (((time.time() - start_time)//60), ((time.time() - start_time)%60), (np.mean(individual_time))))
         return
 
+    # method for evaluate a single individu
     def evaluateIndividu(self, individu):
         individu.fitness = self.fitness(individu)
         individu.cab = self.CAB(individu)
         return
 
+    # method for make evaluation quickest
+    # pincipaly use un local research method
     def partialEvaluate(self, A, B, individu):
         tmp = individu.copyIndividu()
         labelA = individu[A]
@@ -902,7 +944,7 @@ class AEPermutation:
                 self.aux[newcw] = self.aux[newcw] + 1
                 self.affected.append(oldcw);
                 self.affected.append(newcw);
-                comment(str(tmp.fitness)+" + " + str(self.quickEval[newcw]) + " - " + str(self.quickEval[oldcw]))
+                #comment(str(tmp.fitness)+" + " + str(self.quickEval[newcw]) + " - " + str(self.quickEval[oldcw]))
                 tmp.fitness = tmp.fitness + self.quickEval[newcw] - self.quickEval[oldcw]
                 #comment("result = "+str(tmp.fitness))
 
@@ -917,7 +959,7 @@ class AEPermutation:
                 self.aux[newcw] = self.aux[newcw] + 1
                 self.affected.append(oldcw);
                 self.affected.append(newcw);
-                debug(str(tmp.fitness)+" + " + str(self.quickEval[newcw]) + " - " + str(self.quickEval[oldcw]))
+                #debug(str(tmp.fitness)+" + " + str(self.quickEval[newcw]) + " - " + str(self.quickEval[oldcw]))
                 tmp.fitness = tmp.fitness + self.quickEval[newcw] - self.quickEval[oldcw]
                 #debug("result = "+str(tmp.fitness))
 
@@ -932,15 +974,19 @@ class AEPermutation:
             tmp.fitness += tmp.cab
         return tmp
 
+    # part of partialEvaluate
+    # launch if result of partialEvaluate is better then current children
     def updateWeightCounts(self, individu):
         for i in range(0, len(self.affected)):
             individu.weightCount[self.affected[i]] = individu.weightCount[self.affected[i]] + self.aux[self.affected[i]]
             self.aux[self.affected[i]] = 0
             self.affected[i] = 0
 
+    # method for use the same method for all function of evalutation selected
     def fitness(self, elt):
         return self.functionEval(elt)
 
+    # evaluation function for CAB
     def CAB(self, elt):
         cab = self.Size
         for i in range(0, len(self.data)):
@@ -953,6 +999,7 @@ class AEPermutation:
                         cab = cyclicdiff
         return cab
 
+    # method for fill D a data struct need in some evaluation function
     def fillD(self, elt):
         ret = []
         for i in range(0, (self.Size // 2)+1):
@@ -968,6 +1015,8 @@ class AEPermutation:
             ret.append(tmp // 2)
         return ret
 
+    # evaluation function provide by the papers "Adaptive evaluation functions for the cyclic bandwidth problem" f1
+    # and equation (3) in work document
     def fitness1(self, elt):
         d = self.fillD(elt)
 
@@ -977,6 +1026,8 @@ class AEPermutation:
             ret = ret + (self.quickEval[i-1] * d[i - 1])
         return ret
 
+    # evaluation function provide by the papers "Adaptive evaluation functions for the cyclic bandwidth problem" f3
+    # and equation (5) in work document
     def fitness2(self, elt):
         d = self.fillD(elt)
         ret = self.CAB(elt)
@@ -984,6 +1035,7 @@ class AEPermutation:
             ret += self.quickEval[i-1] * d[i-1]
         return ret
 
+    # method for calculate the number of edges who have a certain weight
     def numE(self, elt):
         elt.cab = self.CAB(elt)
         ret = 0
@@ -996,6 +1048,8 @@ class AEPermutation:
                         ret += 1
         return ret
 
+    # evaluation function provide by the papers "An Iterated Three-Phase Search Approach forSolving the Cyclic Bandwidth Problem" fe
+    # and equation (7) in work document
     def fitness3(self, elt):
         ret = self.CAB(elt)
         card = 0
@@ -1005,16 +1059,19 @@ class AEPermutation:
         ret += self.numE(elt)/card
         return ret
 
+    # method for end case of algorithm
     def terminaison(self):
         if self.nbCycle >= self.nbCycleMax:
             return False
         return True
 
+    # method who evaluate the current children
     def evaluatechildren(self):
         self.Childrens.fitness = self.fitness(self.Childrens)
         self.Childrens.cab = self.CAB(self.Childrens)
         return
 
+    # method who return index of Best value of fitness in population
     def CurrentBest(self):
         max = 0
         indMax = 0
@@ -1024,6 +1081,7 @@ class AEPermutation:
                 indMax = i
         return indMax
 
+    # method who return index of Worst value of fitness in population
     def CurrentLow(self):
         min = 1e400
         indMin = 0
@@ -1033,6 +1091,7 @@ class AEPermutation:
                 indMin = i
         return indMin
 
+    # method for calculate the mean of fitness for a Population
     def mean(self):
         meanList = []
         for elt in self.Population:

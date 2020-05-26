@@ -77,7 +77,7 @@ displayCrossover = True
 file = '../Dataset/Instances/caterpillar16.rnd'
 
 #[mutation, selection, crossover, reinsertion, fintness]
-methodList = [[7, 3, 5, 4, 4]]
+methodList = [[7, 4, 5, 4, 4]]
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], "hp:m:c:i:f:l:d:s:vt:", ["help",
@@ -98,8 +98,11 @@ except getopt.GetoptError as err:
     debug(err)  # will print something like "option -a not recognized"
     sys.exit(2)
 
+# default value for diplay parameters
 output = None
 verbose = False
+
+# setting of paramaters
 for o, a in opts:
     if o == "-v":
         verbose = True
@@ -152,10 +155,14 @@ for o, a in opts:
     else:
         assert False, "unhandled option"
 
+# function for load file
 loader = Parser()
 loader.load(file)
 
+# default seed
 Seed = 9001
+
+
 for i in range(0,seedMax):
     print('debut des test pour la seed ' + str(Seed))
     np.random.seed(Seed)

@@ -2,6 +2,7 @@ from output import *
 import time
 
 class Parser:
+    # initialize parameters for stock graph information
     def __init__(self):
         self.data = []
         self.edges = []
@@ -10,6 +11,7 @@ class Parser:
         #self.numEdges = 0
         return
 
+    # function who read a file from a path give in paramater
     def load(self, path):
         start_time = time.time()
         content = []
@@ -27,6 +29,8 @@ class Parser:
                 self.edges.append([])
 
             last = 0
+
+            # reading and stocking of edges from the file
             for i in range(2, len(content)):
                 line = content[i].split(' ')
                 self.data[int(line[0])-1].append(int(line[1]))

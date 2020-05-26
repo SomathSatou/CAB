@@ -1,12 +1,13 @@
 from AEPermutation import AEPermutation
 from Parser import Parser
 from output import *
+from Test import *
 
 import getopt, sys
 import numpy as np
 
 def help():
-    print("Memetic algorithm for Cycil Antibandwith problem, made by Thomas Saout for stage of Master 2,\n"
+    print("Memetic algorithm for Cyclic Antibandwith problem, made by Thomas Saout for stage of Master 2,\n"
           "supervised by Frederic Lardeux and Eduardo Rodriguez-Tello")
     print("argument list")
     print("\t-p , --p : Size of population")
@@ -14,7 +15,7 @@ def help():
     print("\t-c , --c : probability of crossover")
     print("\t-i , --i : number of cycle in algorithm")
     print("\t-f , --f : path for the file contain graph data")
-    print("\t-l , --l : list of operator format \"1,1,1,1\"\n"
+    print("\t-l , --l : list of operator format \"1,1,1,1,1\"\n"
           "\tmutator,select,crossover,insertion\n\n"
           "\t Mutation \n"
           "\t\t1: swap\n"
@@ -42,13 +43,19 @@ def help():
           "\t3: elder\n"
           "\t4: worst\n"
           "\t5: best\n"
+          "\t Fitness \n"
+          "\t1 : CAB \n"
+          "\t2 : function 1\n"
+          "\t3 : function 2\n"
+          "\t4 : function 3\n"
           )
     print("\t-d , --d : list of display 0 or 1, format \'1,1,1,1,1\"\n"
           "\tmean fitness, display cab graph, diplay fitness graph, "
           "diplay graph of opérator of mutation, same for crossover"
           )
+    print("\t-t ,--test : for test function in algorithm, usage be detailled later when implementation is over")
     print("\nArgument not set take a default value, the example below show default value\n"
-          "example : <Python interpretor> Main.py -p 100 -m 80 -c 50 -i 1000 -f \"Dataset/Instances/mesh2D5x25.rnd\" -l \"1,4,4,5\" -d  \"1,0,1,0,0\"\n")
+          "example : <Python interpretor> Main.py -p 100 -m 80 -c 50 -i 1000 -f \"Dataset/Instances/mesh2D5x25.rnd\" -l \"1,4,4,5,2\" -d  \"1,0,1,0,0\"\n")
 
 #default parameters
 P = 100 # taille de ma population
@@ -58,22 +65,22 @@ CMax = 10000 # nombre limite d'itérations pour l'algoritme
 seedMax = 1
 
 # display parameters
-displayMoy = False
-displayCab = False
-displayFitness = False
-displayMutator = False
-displayCrossover = False
+displayMoy = True
+displayCab = True
+displayFitness = True
+displayMutator = True
+displayCrossover = True
 
 #big instance
 #file = '../Dataset/Instances/hypercube11.rnd'
 #test instance
-file = '../Dataset/Instances/mesh2D5x25.rnd'
+file = '../Dataset/Instances/caterpillar16.rnd'
 
-methodList = [[7, 4, 5, 5]]
-minimize = True
+#[mutation, selection, crossover, reinsertion, fintness]
+methodList = [[7, 3, 5, 4, 4]]
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "hp:m:c:i:f:l:d:s:v", ["help",
+    opts, args = getopt.getopt(sys.argv[1:], "hp:m:c:i:f:l:d:s:vt:", ["help",
                                                            "population=",
                                                            "mutation=",
                                                            "crossover=",
@@ -81,7 +88,9 @@ try:
                                                            "file=",
                                                            "methodList=",
                                                            "displayList=",
-                                                           "seed="
+                                                           "seed=",
+                                                           "verbose",
+                                                           "test="
                                                            ])
 except getopt.GetoptError as err:
     # print help information and exit:
@@ -109,7 +118,7 @@ for o, a in opts:
         file = str(a)
     elif o in ("-l", "--methodList"):
         tmp = a.split(',')
-        if len(tmp) != 4:
+        if len(tmp) != 5:
             help()
             debug("mwrong number of method")
             sys.exit()
@@ -118,6 +127,8 @@ for o, a in opts:
             newlist.append(int(elt))
         methodList = []
         methodList.append(newlist)
+        if methodList[len(methodList)-1] != 1:
+            minimize = False
     elif o in ("-d", "--displayList"):
         tmp = a.split(',')
         if len(tmp) != 5:
@@ -131,9 +142,13 @@ for o, a in opts:
         displayCab = newlist[1]
         displayFitness = newlist[2]
         displayMutator = newlist[3]
-        displayCrossover = newlist[4]
+        displayCrosover = newlist[4]
     elif o in ("-s", "--seed"):
         seedMax = int(a)
+    elif o in ("-t", "--test"):
+        testFitness(int(a))
+        #testCab()
+        exit(0)
     else:
         assert False, "unhandled option"
 
@@ -150,4 +165,4 @@ for i in range(0,seedMax):
     Run = AEPermutation(loader, P, M, C, CMax)
 
     Run.launch(methodList, displayMoy, displayCab, displayFitness,
-               displayMutator, displayCrossover, minimize)
+               displayMutator, displayCrossover)

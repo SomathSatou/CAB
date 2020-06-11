@@ -74,11 +74,13 @@ displayCrossover = True
 #big instance
 #file = '../Dataset/Instances/hypercube11.rnd'
 #test instance
-file = '../Dataset/Instances/caterpillar16.rnd'
+file = '../Dataset/Instances/mesh2D5x25.rnd'
 
 #[mutation, selection, crossover, reinsertion, fintness]
-methodList = [[7, 4, 5, 4, 4]]
-
+#test mimimize
+methodList = [[7, 4, 5, 5, 2]]
+#test maximize
+#methodList = [[7, 3, 5, 4, 3]]
 try:
     opts, args = getopt.getopt(sys.argv[1:], "hp:m:c:i:f:l:d:s:vt:", ["help",
                                                            "population=",
@@ -168,6 +170,7 @@ for i in range(0,seedMax):
     np.random.seed(Seed)
     Seed += 1
 
+    #testFitness(2)
     # initialisation de la population
     Run = AEPermutation(loader, P, M, C, CMax)
 

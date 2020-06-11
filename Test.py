@@ -33,16 +33,18 @@ def testFitness(function):
         for elt in instance.data:
             if len(elt) > delta:
                 delta = len(elt)
-        for i in range(0, (instance.Size // 2) + 1):
-            instance.quickEval.append(delta * ((instance.Size // 2) - i + 1))
+        instance.quickEval.append(delta * (instance.limits - 0 + 1))
+        for i in range(1, instance.limits + 1):
+            instance.quickEval.append(delta * (instance.limits - i + 1))
 
     elif function == 3:
         instance.minimize = False
-        for i in range(0, (instance.Size // 2) + 1):
-            instance.quickEval.append(1 / (instance.Size * pow(2, i)))
+        instance.quickEval.append(1 / (instance.Size * pow(2, 0)))
+        for i in range(1, instance.limits + 1):
+            instance.quickEval.append((1 / (instance.Size * pow(2, i))) + instance.quickEval[i - 1])
 
     elif function == 4:
-        instance.quickEval = [0] * ((instance.Size//2)+1)
+        instance.quickEval = [0] * (instance.limits+1)
 
     comment(instance.quickEval)
     comment(instance.data)
@@ -54,15 +56,14 @@ def testFitness(function):
     partialF1.append(instance.Population[0].fitness)
     partialCAB.append(instance.Population[0].cab)
 
-    # permite 0--4
+    # permute 0--4
     tmp = instance.partialEvaluate(0,4,instance.Population[0])
-    instance.updateWeightCounts(tmp)
 
-
-    partialF1.append(tmp.fitness)
-    partialCAB.append(tmp.cab)
+    partialF1.append(instance.Population[0].fitness+tmp[0])
+    partialCAB.append(tmp[1])
 
     instance.permutationIndividu(0,4, instance.Population[0])
+    instance.updateWeightCounts(instance.Population[0], 1)
 
     instance.evaluate()
 
@@ -71,12 +72,12 @@ def testFitness(function):
 
     # permute 4 -- 0
     tmp = instance.partialEvaluate(4, 0, instance.Population[0])
-    instance.updateWeightCounts(tmp)
 
-    partialF1.append(tmp.fitness)
-    partialCAB.append(tmp.cab)
+    partialF1.append(instance.Population[0].fitness+tmp[0])
+    partialCAB.append(tmp[1])
 
     instance.permutationIndividu(4, 0, instance.Population[0])
+    instance.updateWeightCounts(instance.Population[0], 1)
 
     instance.evaluate()
 
@@ -85,12 +86,12 @@ def testFitness(function):
 
     # permute 2 -- 3
     tmp = instance.partialEvaluate(2, 3, instance.Population[0])
-    instance.updateWeightCounts(tmp)
 
-    partialF1.append(tmp.fitness)
-    partialCAB.append(tmp.cab)
+    partialF1.append(instance.Population[0].fitness+tmp[0])
+    partialCAB.append(tmp[1])
 
     instance.permutationIndividu(2, 3, instance.Population[0])
+    instance.updateWeightCounts(instance.Population[0], 1)
 
     instance.evaluate()
 
@@ -99,12 +100,40 @@ def testFitness(function):
 
     # permute 3 -- 2
     tmp = instance.partialEvaluate(3, 2, instance.Population[0])
-    instance.updateWeightCounts(tmp)
 
-    partialF1.append(tmp.fitness)
-    partialCAB.append(tmp.cab)
+    partialF1.append(instance.Population[0].fitness+tmp[0])
+    partialCAB.append(tmp[1])
 
     instance.permutationIndividu(3, 2, instance.Population[0])
+    instance.updateWeightCounts(instance.Population[0], 1)
+
+    instance.evaluate()
+
+    outputF1.append(instance.Population[0].fitness)
+    outputCAB.append(instance.Population[0].cab)
+
+    # permute 4 -- 2
+    tmp = instance.partialEvaluate(4, 2, instance.Population[0])
+
+    partialF1.append(instance.Population[0].fitness+tmp[0])
+    partialCAB.append(tmp[1])
+
+    instance.permutationIndividu(4, 2, instance.Population[0])
+    instance.updateWeightCounts(instance.Population[0], 1)
+
+    instance.evaluate()
+
+    outputF1.append(instance.Population[0].fitness)
+    outputCAB.append(instance.Population[0].cab)
+
+    # permute 2 -- 4
+    tmp = instance.partialEvaluate(2, 4, instance.Population[0])
+
+    partialF1.append(instance.Population[0].fitness+tmp[0])
+    partialCAB.append(tmp[1])
+
+    instance.permutationIndividu(2, 4, instance.Population[0])
+    instance.updateWeightCounts(instance.Population[0], 1)
 
     instance.evaluate()
 

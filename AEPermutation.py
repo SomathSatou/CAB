@@ -145,6 +145,7 @@ class AEPermutation:
 
         # setting of parameters for instance give in paramters
         self.Size = data.Size
+        self.limits = self.Size//2
         self.SizePop = pop
         self.MutationProb = mut
         self.RecombinationProp = rec
@@ -170,8 +171,8 @@ class AEPermutation:
 
         # initialize data struc for partial evaluation
         self.quickEval = []
-        self.aux = [0] * ((self.Size//2)+1)
-        self.affected = []
+        self.aux = [0] * ((self.limits)+1)
+        self.affected = [0] * ((self.limits)+1)
 
         # self.minimize = True
         # endregion Parameters
@@ -227,19 +228,22 @@ class AEPermutation:
                 self.quickEval = [0] * (self.Size+1 // 2)
             elif self.functionEval.__name__ == "fitness1":
                 self.minimize = True
+                self.Best.fitness = 1e400
                 delta = 0
                 for elt in self.data:
                     if len(elt) > delta:
                         delta = len(elt)
-                for i in range(0, (self.Size // 2) + 1):
-                    self.quickEval.append(delta * ((self.Size // 2) - i + 1))
+                self.quickEval.append(delta * (self.limits- 0 + 1))
+                for i in range(1, self.limits + 1):
+                    self.quickEval.append(delta * (self.limits - i + 1))
             elif self.functionEval.__name__ == "fitness2":
                 self.minimize = False
-                for i in range(0, (self.Size // 2) + 1):
-                    self.quickEval.append(1 / (self.Size * pow(2, i)))
+                self.quickEval.append(1 / (self.Size * pow(2, 0)))
+                for i in range(1, self.limits + 1):
+                    self.quickEval.append((1 / (self.Size * pow(2, i)))+self.quickEval[i-1])
             elif self.functionEval.__name__ == "fitness3":
                 self.minimize = False
-                for i in range(0, (self.Size // 2) + 1):
+                for i in range(0, self.limits + 1):
                     self.quickEval.append(0)
 
             # evaluate initial population
@@ -265,10 +269,11 @@ class AEPermutation:
 
                 # Save best Solution
                 if self.minimize:
-                    if (self.Best.fitness > self.Population[self.CurrentLow()].fitness) and (self.Best.cab < self.Population[self.CurrentLow()].cab):
+                    comment("hello")
+                    if self.Best.fitness > self.Population[self.CurrentLow()].fitness:
                         self.Best = self.Population[self.CurrentLow()].copyIndividu()
                 else:
-                    if (self.Best.fitness < self.Population[self.CurrentBest()].fitness) and (self.Best.cab < self.Population[self.CurrentBest()].cab):
+                    if self.Best.fitness < self.Population[self.CurrentBest()].fitness:
                         self.Best = self.Population[self.CurrentBest()].copyIndividu()
 
                 # graph Value
@@ -284,7 +289,6 @@ class AEPermutation:
                 self.moyY.append(self.mean())
                 self.cab.append(self.Population[self.CurrentBest()].cab)
 
-        print(Label)
 
         # part for write result in file
         fichier = open(Label + ".txt", "a")
@@ -346,147 +350,6 @@ class AEPermutation:
 
         print("La meilleur solution que l'algorithme as trouvé est :\n\t" + str(self.Best.label))
         print("elle as un cab = "+ str(self.Best.cab))
-
-    # this method is method use past for some test not use it
-    def launch2UCB(self, displayPlot, displayMoy, displayCab, displayFitness,
-                   displayMutator, displayCrossover, displayOP, minimize):
-        # cette fonction as pour but de tester notre algorithme avec 2 bandit manchot, un seul les opérateur
-        # de croissement et l'autre sur les opérateur de mutations
-        # 5 list pour conserver l'évolution des opérateur de mutation
-        # 4 autre pour celle de croissement
-        # !!!!!!!!!!!!!!  not use anymore   !!!!!!!!!!!!!!
-        self.nbCycle = 0
-
-        self.mutationType = 7
-        self.recombinationType = 5
-        if minimize:
-            self.reinsertionType = 5
-            self.selectionType = 4  # selection par tournoi
-        else:
-            self.reinsertionType = 4
-            self.selectionType = 3  # selection par tournoi
-        Label = ""
-
-        select = self.selSwitch.get(self.selectionType, lambda: self.twoBest)
-        Label += select.__name__ + ","
-
-        recombine = self.recSwitch.get(self.recombinationType, lambda: self.crossover)
-        Label += recombine.__name__ + ","
-
-        mutation = self.mutSwitch.get(self.mutationType, lambda: self.swap)
-        Label += mutation.__name__ + ","
-
-        reinsertion = self.reiSwitch.get(self.reinsertionType, lambda: self.bestoflower)
-        Label += reinsertion.__name__ + ","
-
-
-        # valeur de debug
-        # last = 0
-
-        # partie ou on rempli quickEval
-        if self.functionEval.__name__ == "fitness1":
-            delta = 0
-            for elt in self.data:
-                if len(elt) > delta:
-                    delta = len(elt)
-            for i in range(0, (self.Size // 2)+1):
-                self.quickEval.append(delta * ((self.Size // 2) - i + 1))
-        elif self.functionEval.__name__ == "fitness2":
-            for i in range(0, (self.Size // 2)+1):
-                self.quickEval.append(1/(self.Size*pow(2,i)))
-        elif self.functionEval.__name__ == "fitness3":
-            self.quickEval = [0] * ((self.Size//2)+1)
-
-        self.evaluate()
-        while self.terminaison():
-            # selection
-            self.parents = select()
-
-            # Recombine
-            self.Childrens = recombine(self.parents)
-
-            # mutation
-            mutation()
-
-            # evaluate children
-            self.evaluatechildren()
-
-            # Reinsertion
-            reinsertion()
-
-            # graph Value
-            # self.evaluate()
-            # self.evaluateCab()
-            self.nbCycle = self.nbCycle + 1
-            affichage = "nombre de tour effectuer : " + str(self.nbCycle) + "/" + str(self.nbCycleMax)
-            print(affichage)
-            # ajouter
-            self.x.append(self.nbCycle)
-            if self.minimize:
-                self.y.append(self.Population[self.CurrentLow()].fitness)
-            else:
-                self.y.append(self.Population[self.CurrentBest()].fitness)
-
-            self.moyY.append(self.mean())
-            self.cab.append(self.Population[self.CurrentBest()].cab)
-
-        print(Label)
-
-        fichier = open(Label + ".txt", "a")
-
-        for elt in self.y:
-            fichier.write(str(elt) + ";")
-
-        fichier.write("\n")
-        fichier.close()
-
-        if displayFitness:
-            plt.plot(self.x, self.y, label=Label)
-            plt.ylabel("Function d'évaluation")
-            plt.xlavel("Nombre d'itération")
-
-
-        if displayMoy:
-            tmp = "moy : " + Label
-            plt.plot(self.x, self.moyY, label=tmp)
-
-        if displayCab:
-            tmp = "cab : " + Label
-            plt.plot(self.x, self.cab, label=tmp)
-
-        if displayMutator:
-            for i in range (0, self.UCB_mutator.NbrOP):
-                title = self.mutSwitch.get(i+1, lambda: self.crossoverUCB).__name__
-                plt.plot(self.x, self.UCB_mutator.output[i], label=title)
-
-        if displayCrossover:
-            for i in range (0, self.UCB_crossover.NbrOP):
-                title = self.recSwitch.get(i+1, lambda: self.mutatorUCB).__name__
-                plt.plot(self.x, self.UCB_crossover.output[i], label=title)
-
-        if displayOP:
-            for i in range(1, self.UCB_mutator.NbrOP):
-                title = self.mutSwitch.get(i+1, lambda: self.mutatorUCB).__name__
-                plt.plot(self.x, self.UCB_mutator.utilisation[i], label=title)
-
-            for i in range (1, self.UCB_crossover.NbrOP):
-                title = self.recSwitch.get(i+1, lambda: self.crossoverUCB).__name__
-                plt.plot(self.x, self.UCB_crossover.utilisation[i], label=title)
-
-
-
-        # if mutation == flipsAdaptatifPursuit:
-        #    fichierOP = open(Label + "dataOPAPW.txt", "a")
-        # dépendant de opérateur cible , mutation recombinaison, etc ...
-        #    for iop in range(0, 2):
-        #       for elt in DataOP:
-        #            fichierOP.write(str(elt[iop]) + ";")
-        #        fichierOP.write("\n")
-        #    fichierOP.write("\n")
-        #    fichierOP.close()
-        if (displayPlot):
-            plt.legend()
-            plt.show()
 
     # region Selection
     def twoBest(self):
@@ -575,7 +438,6 @@ class AEPermutation:
                     next = parents[0][i]
                     check = parents[1].index(next)
 
-                    #boucle infinie
                     while not childs[check] == 0:
                         next = parents[0][check]
                         check = parents[1].label.index(next)
@@ -585,6 +447,7 @@ class AEPermutation:
             for i in range(0, self.Size):
                 if childs[i] == 0:
                     childs[i] = parents[1][i]
+            self.evaluateIndividu(childs)
         else:
             childs = parents[0]
         return childs
@@ -610,6 +473,7 @@ class AEPermutation:
                         childs[i] = parents[1][ajout.pop()]
                     else:
                         childs[i] = parents[1][i]
+            self.evaluateIndividu(childs)
         else:
             childs = parents[0]
         return childs
@@ -657,7 +521,7 @@ class AEPermutation:
                             if len(voisin[elt - 1]) < longueur:
                                 longueur = len(voisin[elt - 1])
                                 x = elt
-
+            self.evaluateIndividu(childs)
         else:
             childs = parents[0]
         return childs
@@ -679,38 +543,39 @@ class AEPermutation:
                 else:
                     for elt in cycle:
                         childs[parents[0].index(elt)] = elt
+            self.evaluateIndividu(childs)
         else:
             childs = parents[0]
         return childs
 
     def crossoverUCB(self, parents):
         childs = parents[0]
-        if randint(0, 100) < self.RecombinationProp:
-            meanParentsEval = (parents[0].fitness + parents[1].fitness) / 2
+        meanParentsEval = (parents[0].fitness + parents[1].fitness) / 2
 
-            crossover_selected = 0
-            max_upper_bound = -1e400
+        crossover_selected = 0
+        max_upper_bound = -1e400
 
-            for i in range(0, self.UCB_crossover.NbrOP):
-                if self.UCB_crossover.numbers_of_mutation[i] > 0:
-                    average_reward = self.UCB_crossover.sums_of_reward[i] / self.UCB_crossover.numbers_of_mutation[i]
-                    delta_i = math.sqrt(2 * math.log(self.nbCycle + 1) / self.UCB_crossover.numbers_of_mutation[i])
-                    upper_bound = average_reward + delta_i
-                else:
-                    upper_bound = 1e400
-                if upper_bound > max_upper_bound:
-                    max_upper_bound = upper_bound
-                    crossover_selected = i
-            self.UCB_crossover.numbers_of_mutation[crossover_selected] += 1
-            tmp = self.recSwitch.get(crossover_selected + 1, lambda: self.crossover())
-            #comment(tmp.__name__)
-            childs = tmp(parents)
-            reward = self.fitness(childs) - meanParentsEval
-            #comment('crossover reward = '+ str(reward))
-            if self.minimize:
-                self.UCB_crossover.sums_of_reward[crossover_selected] -= reward
+        for i in range(0, self.UCB_crossover.NbrOP):
+            if self.UCB_crossover.numbers_of_mutation[i] > 10:
+                average_reward = self.UCB_crossover.sums_of_reward[i] / self.UCB_crossover.numbers_of_mutation[i]
+                delta_i = math.sqrt(2 * math.log(self.nbCycle + 1) / self.UCB_crossover.numbers_of_mutation[i])
+                upper_bound = average_reward + delta_i
             else:
-                self.UCB_crossover.sums_of_reward[crossover_selected] += reward
+                upper_bound = 1e400
+            if upper_bound > max_upper_bound:
+                max_upper_bound = upper_bound
+                crossover_selected = i
+        self.UCB_crossover.numbers_of_mutation[crossover_selected] += 1
+        tmp = self.recSwitch.get(crossover_selected + 1, lambda: self.crossover)
+        #comment(tmp.__name__)
+        childs = tmp(parents)
+        reward = self.fitness(childs) - meanParentsEval
+        #comment('crossover reward = '+ str(reward))
+        if self.minimize:
+            self.UCB_crossover.sums_of_reward[crossover_selected] -= reward
+        else:
+            self.UCB_crossover.sums_of_reward[crossover_selected] += reward
+
         for i in range(0,self.UCB_crossover.NbrOP):
             self.UCB_crossover.output[i].append(
                 self.UCB_crossover.sums_of_reward[i] / (self.UCB_crossover.numbers_of_mutation[i]+1)
@@ -734,6 +599,7 @@ class AEPermutation:
             while len(Ltirage) > 0:
                 swapB = Ltirage.pop()
                 self.permutation(swapA, swapB)
+                self.updateWeightCounts(self.Childrens, 1)
                 swapA = swapB
         return
 
@@ -744,25 +610,51 @@ class AEPermutation:
             tmp = []
             for i in range(A, B):
                 tmp.append(self.Childrens[i])
+            olds = tmp.copy()
             shuffle(tmp)
             for i in range(A, B):
                 self.Childrens[i] = tmp[i - A]
-
+            self.updateWeightCountRange(A,B, olds)
         return
 
     def swap(self):
         if randint(0, 100) <= self.MutationProb:
             A = randint(0, len(self.Childrens.label) - 2)
             B = randint(A + 1, len(self.Childrens.label) - 1)
-            tmp = self.Childrens.label[A]
-            self.Childrens.label[A] = self.Childrens.label[B]
-            self.Childrens.label[B] = tmp
+            self.permutation(A, B)
+            self.updateWeightCounts(self.Childrens, 1)
         return
 
     def permutation(self, A, B):
+        labelA = self.Childrens[A]
+        labelB = self.Childrens[B]
+        for elt in self.data[A]:
+            if not self.Childrens[elt] == B:
+                oldw = abs(labelA - self.Childrens[elt])
+                neww = abs(labelB - self.Childrens[elt])
+                oldcw = min(oldw, self.Size - oldw)
+                newcw = min(neww, self.Size - neww)
+                self.aux[oldcw] = self.aux[oldcw] - 1
+                self.aux[newcw] = self.aux[newcw] + 1
+                self.affected.append(oldcw);
+                self.affected.append(newcw);
+
+        for elt in self.data[B]:
+            if not self.Childrens[elt] == A:
+                oldw = abs(labelB - self.Childrens[elt])
+                neww = abs(labelA - self.Childrens[elt])
+                oldcw = min(oldw, self.Size - oldw)
+                newcw = min(neww, self.Size - neww)
+                self.aux[oldcw] = self.aux[oldcw] - 1
+                self.aux[newcw] = self.aux[newcw] + 1
+                self.affected.append(oldcw);
+                self.affected.append(newcw);
+
         tmp = self.Childrens[A]
         self.Childrens[A] = self.Childrens[B]
         self.Childrens[B] = tmp
+
+
         return
 
     def permutationIndividu(self, A, B, individu):
@@ -776,9 +668,8 @@ class AEPermutation:
             for A in range(0, len(self.Childrens)-1):
                 if randint(0, 100) <= ((1 / self.Size) * 100):
                     B = randint(A + 1, len(self.Childrens)-1)
-                    tmp = self.Childrens[A]
-                    self.Childrens[A] = self.Childrens[B]
-                    self.Childrens[B] = tmp
+                    self.permutation(A,B)
+                    self.updateWeightCounts(self.Childrens, 1)
         return
 
     def reinsert(self):
@@ -786,9 +677,13 @@ class AEPermutation:
         if randint(0, 100) <= self.MutationProb:
             A = randint(0, len(childs) - 2)
             B = randint(A + 1, len(childs) - 1)
+            olds = []
+            for i in range(A, B):
+                olds.append(self.Childrens[i])
             tmp = childs[B]
             childs.label.remove(B)
             childs.label.insert(tmp, A + 1)
+            self.updateWeightCountRange(A,B, olds)
         self.Childrens = childs.copyIndividu()
         return
 
@@ -797,6 +692,9 @@ class AEPermutation:
         if randint(0, 100) <= self.MutationProb:
             A = randint(0, len(childs) - 2)
             B = randint(A + 1, len(childs) - 1)
+            olds = []
+            for i in range(A, B):
+                olds.append(self.Childrens[i])
             for i in range(A, B - ((B - A) // 2) - 1):
                 tmp = childs[i]
                 childs[i] = childs[B - (i - A)]
@@ -806,7 +704,10 @@ class AEPermutation:
                 tmp = childs[last]
                 childs[last] = childs[last+1]
                 childs[last+1] = tmp
+
             self.Childrens = childs
+            self.updateWeightCountRange(A,B, olds)
+
         return
 
     # region local research
@@ -814,30 +715,32 @@ class AEPermutation:
         if randint(0, 100) <= self.MutationProb:
             for i in range(0, len(self.Childrens.label)-2):
                 B = randint(i+1, len(self.Childrens.label)-1)
-                tmp = self.partialEvaluate(i,B,self.Childrens).copyIndividu()
+                tmp = self.partialEvaluate(i,B,self.Childrens)
                 if self.minimize:
-                    if(tmp.fitness < self.Childrens.fitness):
-                        self.permutation(i,B)
-                        self.updateWeightCounts(self.Childrens)
-                        self.Childrens.fitness = tmp.fitness
+                    if(tmp[0] < 0):
+                        self.permutationIndividu(i,B, self.Childrens)
+                        self.updateWeightCounts(self.Childrens, 1)
+                        self.Childrens.fitness += tmp[0]
+                        return
                 else:
-                    if(tmp.fitness > self.Childrens.fitness):
-                        self.permutation(i,B)
-                        self.updateWeightCounts(self.Childrens)
-                        self.Childrens.fitness = tmp.fitness
-
+                    if(tmp[0] > 0):
+                        self.permutationIndividu(i,B, self.Childrens)
+                        self.updateWeightCounts(self.Childrens, 1)
+                        self.Childrens.fitness += tmp[0]
+                        return
+        self.updateWeightCounts(self.Childrens, 0)
         return
     # endregion local research
 
     def mutatorUCB(self):
         self.evaluatechildren()
         OldChildrenEval = self.Childrens.fitness
-
+        #debug(self.Childrens.fitness)
         mutation_selected = 0
         max_upper_bound = -1e400
 
         for i in range(0, self.UCB_mutator.NbrOP):
-            if self.UCB_mutator.numbers_of_mutation[i] > 0:
+            if self.UCB_mutator.numbers_of_mutation[i] > 10:
                 average_reward = self.UCB_mutator.sums_of_reward[i] / self.UCB_mutator.numbers_of_mutation[i]
                 delta_i = math.sqrt(2 * math.log(self.nbCycle + 1) / self.UCB_mutator.numbers_of_mutation[i])
                 upper_bound = average_reward + delta_i
@@ -853,8 +756,9 @@ class AEPermutation:
         mutator()
 
         self.evaluatechildren()
+        #debug(self.Childrens.fitness)
         reward = self.Childrens.fitness - OldChildrenEval
-        #debug('mutator reward = '+ str(reward))
+        debug('mutator reward = '+ str(reward))
 
         if self.minimize:
             self.UCB_mutator.sums_of_reward[mutation_selected] -= reward
@@ -916,43 +820,44 @@ class AEPermutation:
         individual_time = []
         for elt in self.Population:
             elt_time = time.time()
-            elt.fitness = self.fitness(elt)
             elt.cab = self.CAB(elt)
+            elt.fitness = self.fitness(elt)
             individual_time.append(time.time() - elt_time)
         print("evaluation complete in %d minute %s seconds with  %s second mean per individual"% (((time.time() - start_time)//60), ((time.time() - start_time)%60), (np.mean(individual_time))))
         return
 
     # method for evaluate a single individu
     def evaluateIndividu(self, individu):
-        individu.fitness = self.fitness(individu)
         individu.cab = self.CAB(individu)
+        individu.fitness = self.fitness(individu)
         return
 
     # method for make evaluation quickest
     # pincipaly use un local research method
     def partialEvaluate(self, A, B, individu):
-        tmp = individu.copyIndividu()
+        oldfitness = individu.fitness
+        deltafitness = 0
         labelA = individu[A]
         labelB = individu[B]
         for elt in self.data[A]:
-            if not individu[elt-1] == B:
-                oldw = abs(labelA - individu[elt-1])
-                neww = abs(labelB - individu[elt-1])
+            if not individu[elt] == labelB:
+                oldw = abs(labelA - individu[elt])
+                neww = abs(labelB - individu[elt])
                 oldcw = min(oldw, self.Size - oldw)
                 newcw = min(neww, self.Size - neww)
                 self.aux[oldcw] = self.aux[oldcw] - 1
                 self.aux[newcw] = self.aux[newcw] + 1
-                self.affected.append(oldcw);
-                self.affected.append(newcw);
+                self.affected.append(oldcw)
+                self.affected.append(newcw)
                 #comment(str(tmp.fitness)+" + " + str(self.quickEval[newcw]) + " - " + str(self.quickEval[oldcw]))
-                tmp.fitness = tmp.fitness + self.quickEval[newcw] - self.quickEval[oldcw]
+                deltafitness = deltafitness + self.quickEval[newcw] - self.quickEval[oldcw]
                 #comment("result = "+str(tmp.fitness))
 
 
         for elt in self.data[B]:
-            if not individu[elt-1] == A:
-                oldw = abs(labelB - individu[elt-1])
-                neww = abs(labelA - individu[elt-1])
+            if not individu[elt] == labelA:
+                oldw = abs(labelB - individu[elt])
+                neww = abs(labelA - individu[elt])
                 oldcw = min(oldw, self.Size - oldw)
                 newcw = min(neww, self.Size - neww)
                 self.aux[oldcw] = self.aux[oldcw] - 1
@@ -960,27 +865,56 @@ class AEPermutation:
                 self.affected.append(oldcw);
                 self.affected.append(newcw);
                 #debug(str(tmp.fitness)+" + " + str(self.quickEval[newcw]) + " - " + str(self.quickEval[oldcw]))
-                tmp.fitness = tmp.fitness + self.quickEval[newcw] - self.quickEval[oldcw]
+                deltafitness = deltafitness + self.quickEval[newcw] - self.quickEval[oldcw]
                 #debug("result = "+str(tmp.fitness))
 
-        d = self.fillD(tmp)
-        indice = 1
-        if self.functionEval.__name__ != "fitness1":
-            tmp.fitness -= tmp.cab
-        while d[indice] + self.aux[indice] == 0:
+        indice = 0
+        while individu.weightCount[indice] + self.aux[indice] == 0:
             indice = indice + 1
-        tmp.cab = indice
-        if self.functionEval.__name__ != "fitness1":
-            tmp.fitness += tmp.cab
-        return tmp
+        deltaCAB = indice
+        delta = []
+
+        if self.functionEval.__name__ == "fitness3":
+            card = 0
+            for A in range(0, len(self.data)):
+                if len(self.data[A]) != 0:
+                    card += len(self.data[A])
+
+            newfitness = deltaCAB + (individu.weightCount[deltaCAB] / card)
+
+            deltafitness = newfitness-oldfitness
+
+        delta.append(deltafitness)
+        delta.append(deltaCAB)
+        return delta
+
+    def updateWeightCountRange(self, A, B, olds):
+        check = []
+        for indice in range(A,B):
+            label = self.Childrens[indice]
+            labelOld = olds[indice-A]
+            check.append(label)
+            for elt in self.data[indice]:
+                if not check.__contains__(self.Childrens[elt]):
+                    oldw = abs(labelOld - self.Childrens[elt])
+                    neww = abs(label - self.Childrens[elt])
+                    oldcw = min(oldw, self.Size - oldw)
+                    newcw = min(neww, self.Size - neww)
+                    self.aux[oldcw] = self.aux[oldcw] - 1
+                    self.aux[newcw] = self.aux[newcw] + 1
+                    self.affected.append(oldcw)
+                    self.affected.append(newcw)
+        self.updateWeightCounts(self.Childrens, 1)
+        return
 
     # part of partialEvaluate
     # launch if result of partialEvaluate is better then current children
-    def updateWeightCounts(self, individu):
+    def updateWeightCounts(self, individu, accepted):
         for i in range(0, len(self.affected)):
-            individu.weightCount[self.affected[i]] = individu.weightCount[self.affected[i]] + self.aux[self.affected[i]]
+            if(accepted):
+                individu.weightCount[self.affected[i]] = individu.weightCount[self.affected[i]] + self.aux[self.affected[i]]
             self.aux[self.affected[i]] = 0
-            self.affected[i] = 0
+        self.affected = []
 
     # method for use the same method for all function of evalutation selected
     def fitness(self, elt):
@@ -989,10 +923,11 @@ class AEPermutation:
     # evaluation function for CAB
     def CAB(self, elt):
         cab = self.Size
+        elt.weightCount = [0] * (self.limits+1)
         for i in range(0, len(self.data)):
             for j in self.data[i]:
-                if (i + 1) < j:
-                    absDiff = abs(elt[i] - elt[j - 1])
+                if i < j:
+                    absDiff = abs(elt[i] - elt[j])
                     cyclicdiff = min(absDiff, self.Size - absDiff)
                     elt.weightCount[cyclicdiff] = elt.weightCount[cyclicdiff] +1
                     if cyclicdiff < cab:
@@ -1002,7 +937,7 @@ class AEPermutation:
     # method for fill D a data struct need in some evaluation function
     def fillD(self, elt):
         ret = []
-        for i in range(0, (self.Size // 2)+1):
+        for i in range(0, (self.limits)+1):
             tmp = 0
             for j in range(0, len(self.data)):
                 for k in range(0, len(self.data[j])):
@@ -1018,21 +953,17 @@ class AEPermutation:
     # evaluation function provide by the papers "Adaptive evaluation functions for the cyclic bandwidth problem" f1
     # and equation (3) in work document
     def fitness1(self, elt):
-        d = self.fillD(elt)
-
         ret = 0
-        for i in range(1, (self.Size // 2)+2):
-
-            ret = ret + (self.quickEval[i-1] * d[i - 1])
+        for i in range(1, self.limits+1):
+            ret = ret + (self.quickEval[i-1] * elt.weightCount[i - 1])
         return ret
 
     # evaluation function provide by the papers "Adaptive evaluation functions for the cyclic bandwidth problem" f3
     # and equation (5) in work document
     def fitness2(self, elt):
-        d = self.fillD(elt)
-        ret = self.CAB(elt)
-        for i in range(1, (self.Size // 2)+1):
-            ret += self.quickEval[i-1] * d[i-1]
+        ret = elt.cab
+        for i in range(1, self.limits+1):
+            ret += self.quickEval[i-1] * elt.weightCount[i-1]
         return ret
 
     # method for calculate the number of edges who have a certain weight
@@ -1051,12 +982,12 @@ class AEPermutation:
     # evaluation function provide by the papers "An Iterated Three-Phase Search Approach forSolving the Cyclic Bandwidth Problem" fe
     # and equation (7) in work document
     def fitness3(self, elt):
-        ret = self.CAB(elt)
+        ret = elt.cab
         card = 0
         for A in range(0, len(self.data)):
             if len(self.data[A]) != 0:
                 card += len(self.data[A])
-        ret += self.numE(elt)/card
+        ret += elt.weightCount[ret]/card # ret here have CAB value
         return ret
 
     # method for end case of algorithm
@@ -1079,6 +1010,7 @@ class AEPermutation:
             if self.Population[i].fitness > max:
                 max = self.Population[i].fitness
                 indMax = i
+        debug(self.Population[indMax].)
         return indMax
 
     # method who return index of Worst value of fitness in population

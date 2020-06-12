@@ -872,17 +872,16 @@ class AEPermutation:
         deltaCAB = indice
         delta = []
 
-        if (self.functionEval.__name__ == "fitness3") or (self.functionEval.__name__ == "fitness2"):
+        if self.functionEval.__name__ == "fitness2":
             deltafitness += deltaCAB - individu.cab
-    #    if self.functionEval.__name__ == "fitness3":
-    #        card = 0
-    #        for A in range(0, len(self.data)):
-    #            if len(self.data[A]) != 0:
-    #                card += len(self.data[A])
+        if self.functionEval.__name__ == "fitness3":
+            card = 0
+            for A in range(0, len(self.data)):
+                if len(self.data[A]) != 0:
+                    card += len(self.data[A])
+            newfitness = deltaCAB + ((individu.weightCount[deltaCAB]+self.aux[deltaCAB]) / card)
 
-     #       newfitness = deltaCAB + (individu.weightCount[deltaCAB] / card)
-
-     #       deltafitness = newfitness-oldfitness
+            deltafitness = newfitness-oldfitness
 
         delta.append(deltafitness)
         delta.append(deltaCAB)
@@ -988,6 +987,8 @@ class AEPermutation:
         for A in range(0, len(self.data)):
             if len(self.data[A]) != 0:
                 card += len(self.data[A])
+
+        comment(elt.weightCount)
         ret += elt.weightCount[ret]/card # ret here have CAB value
         return ret
 

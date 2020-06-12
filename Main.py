@@ -157,6 +157,7 @@ for o, a in opts:
     else:
         assert False, "unhandled option"
 
+#testFitness(3)
 # function for load file
 loader = Parser()
 loader.load(file)

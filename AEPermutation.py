@@ -233,9 +233,9 @@ class AEPermutation:
                 for elt in self.data:
                     if len(elt) > delta:
                         delta = len(elt)
-                self.quickEval.append(delta * (self.limits- 0 + 1))
+                self.quickEval.append(pow(delta * (self.limits - 0 + 1), 5))
                 for i in range(1, self.limits + 1):
-                    self.quickEval.append(delta * (self.limits - i + 1))
+                    self.quickEval.append(pow(delta * (self.limits - i + 1), 5))
             elif self.functionEval.__name__ == "fitness2":
                 self.minimize = False
                 self.quickEval.append(1 / (self.Size * pow(2, 0)))
@@ -284,10 +284,12 @@ class AEPermutation:
                 self.x.append(self.nbCycle)
                 if self.minimize:
                     self.y.append(self.Population[self.CurrentLow()].fitness)
+                    self.cab.append(self.Population[self.CurrentLow()].cab)
                 else:
                     self.y.append(self.Population[self.CurrentBest()].fitness)
+                    self.cab.append(self.Population[self.CurrentBest()].cab)
                 self.moyY.append(self.mean())
-                self.cab.append(self.Population[self.CurrentBest()].cab)
+
 
 
         # part for write result in file
@@ -801,14 +803,10 @@ class AEPermutation:
 
     def worst(self):
         indice = self.CurrentLow()
-        self.Population[indice].fitness = self.Childrens.fitness
-        self.Population[indice].cab = self.CAB(self.Childrens)
         self.Population[indice] = self.Childrens.copyIndividu()
 
     def best(self):
         indice = self.CurrentBest()
-        self.Population[indice].fitness = self.Childrens.fitness
-        self.Population[indice].cab = self.CAB(self.Childrens)
         self.Population[indice] = self.Childrens.copyIndividu()
     # endregion Insertion
 
@@ -849,7 +847,7 @@ class AEPermutation:
                 self.aux[newcw] = self.aux[newcw] + 1
                 self.affected.append(oldcw)
                 self.affected.append(newcw)
-                #comment(str(tmp.fitness)+" + " + str(self.quickEval[newcw]) + " - " + str(self.quickEval[oldcw]))
+                #comment(str(deltafitness)+" + " + str(self.quickEval[newcw]) + " - " + str(self.quickEval[oldcw]))
                 deltafitness = deltafitness + self.quickEval[newcw] - self.quickEval[oldcw]
                 #comment("result = "+str(tmp.fitness))
 
@@ -864,7 +862,7 @@ class AEPermutation:
                 self.aux[newcw] = self.aux[newcw] + 1
                 self.affected.append(oldcw);
                 self.affected.append(newcw);
-                #debug(str(tmp.fitness)+" + " + str(self.quickEval[newcw]) + " - " + str(self.quickEval[oldcw]))
+                #debug(str(deltafitness)+" + " + str(self.quickEval[newcw]) + " - " + str(self.quickEval[oldcw]))
                 deltafitness = deltafitness + self.quickEval[newcw] - self.quickEval[oldcw]
                 #debug("result = "+str(tmp.fitness))
 
@@ -874,15 +872,17 @@ class AEPermutation:
         deltaCAB = indice
         delta = []
 
-        if self.functionEval.__name__ == "fitness3":
-            card = 0
-            for A in range(0, len(self.data)):
-                if len(self.data[A]) != 0:
-                    card += len(self.data[A])
+        if (self.functionEval.__name__ == "fitness3") or (self.functionEval.__name__ == "fitness2"):
+            deltafitness += deltaCAB - individu.cab
+    #    if self.functionEval.__name__ == "fitness3":
+    #        card = 0
+    #        for A in range(0, len(self.data)):
+    #            if len(self.data[A]) != 0:
+    #                card += len(self.data[A])
 
-            newfitness = deltaCAB + (individu.weightCount[deltaCAB] / card)
+     #       newfitness = deltaCAB + (individu.weightCount[deltaCAB] / card)
 
-            deltafitness = newfitness-oldfitness
+     #       deltafitness = newfitness-oldfitness
 
         delta.append(deltafitness)
         delta.append(deltaCAB)
@@ -955,7 +955,8 @@ class AEPermutation:
     def fitness1(self, elt):
         ret = 0
         for i in range(1, self.limits+1):
-            ret = ret + (self.quickEval[i-1] * elt.weightCount[i - 1])
+            ret = ret + (self.quickEval[i] * elt.weightCount[i])
+            #ret = ret + (pow((self.quickEval[i]),2)) * elt.weightCount[i]
         return ret
 
     # evaluation function provide by the papers "Adaptive evaluation functions for the cyclic bandwidth problem" f3
@@ -963,7 +964,7 @@ class AEPermutation:
     def fitness2(self, elt):
         ret = elt.cab
         for i in range(1, self.limits+1):
-            ret += self.quickEval[i-1] * elt.weightCount[i-1]
+            ret += self.quickEval[i] * elt.weightCount[i]
         return ret
 
     # method for calculate the number of edges who have a certain weight
@@ -1010,7 +1011,7 @@ class AEPermutation:
             if self.Population[i].fitness > max:
                 max = self.Population[i].fitness
                 indMax = i
-        debug(self.Population[indMax].)
+        #debug(self.Population[indMax].fitness)
         return indMax
 
     # method who return index of Worst value of fitness in population

@@ -35,7 +35,7 @@ def testFitness(function):
                 delta = len(elt)
         instance.quickEval.append(delta * (instance.limits - 0 + 1))
         for i in range(1, instance.limits + 1):
-            instance.quickEval.append(delta * (instance.limits - i + 1))
+            instance.quickEval.append(pow(delta * (instance.limits - i + 1), 2))
 
     elif function == 3:
         instance.minimize = False

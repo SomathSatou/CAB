@@ -78,9 +78,9 @@ file = '../Dataset/Instances/mesh2D5x25.rnd'
 
 #[mutation, selection, crossover, reinsertion, fintness]
 #test mimimize
-methodList = [[7, 4, 5, 5, 2]]
+#methodList = [[7, 4, 5, 5, 2]]
 #test maximize
-#methodList = [[7, 3, 5, 4, 3]]
+methodList = [[7, 3, 5, 4, 4]]
 try:
     opts, args = getopt.getopt(sys.argv[1:], "hp:m:c:i:f:l:d:s:vt:", ["help",
                                                            "population=",

@@ -269,7 +269,6 @@ class AEPermutation:
 
                 # Save best Solution
                 if self.minimize:
-                    comment("hello")
                     if self.Best.fitness > self.Population[self.CurrentLow()].fitness:
                         self.Best = self.Population[self.CurrentLow()].copyIndividu()
                 else:
@@ -760,7 +759,7 @@ class AEPermutation:
         self.evaluatechildren()
         #debug(self.Childrens.fitness)
         reward = self.Childrens.fitness - OldChildrenEval
-        debug('mutator reward = '+ str(reward))
+        #debug('mutator reward = '+ str(reward))
 
         if self.minimize:
             self.UCB_mutator.sums_of_reward[mutation_selected] -= reward
@@ -988,7 +987,7 @@ class AEPermutation:
             if len(self.data[A]) != 0:
                 card += len(self.data[A])
 
-        comment(elt.weightCount)
+        #comment(elt.weightCount)
         ret += elt.weightCount[ret]/card # ret here have CAB value
         return ret
 

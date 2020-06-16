@@ -1,5 +1,6 @@
 import math
 from random import *
+from decimal import *
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -81,6 +82,7 @@ class Individu:
 
 
 class AEPermutation:
+    getcontext().prec = 40
     # its the controler in this algorithm
     def __init__(self, data, pop, mut, rec, nbcMax):
         # method for initialize data structure
@@ -238,14 +240,15 @@ class AEPermutation:
                     self.quickEval.append(pow(delta * (self.limits - i + 1), 5))
             elif self.functionEval.__name__ == "fitness2":
                 self.minimize = False
-                self.quickEval.append(1 / (self.Size * pow(2, 0)))
+                self.quickEval.append(Decimal(1) / Decimal(self.Size * pow(2, 0)))
                 for i in range(1, self.limits + 1):
-                    self.quickEval.append((1 / (self.Size * pow(2, i)))+self.quickEval[i-1])
+                    self.quickEval.append(Decimal(1) / Decimal((self.Size * pow(2, i)))+self.quickEval[i-1])
             elif self.functionEval.__name__ == "fitness3":
                 self.minimize = False
                 for i in range(0, self.limits + 1):
                     self.quickEval.append(0)
 
+            debug(self.quickEval)
             # evaluate initial population
             self.evaluate()
 
@@ -560,9 +563,11 @@ class AEPermutation:
             if self.UCB_crossover.numbers_of_mutation[i] > 10:
                 average_reward = self.UCB_crossover.sums_of_reward[i] / self.UCB_crossover.numbers_of_mutation[i]
                 delta_i = math.sqrt(2 * math.log(self.nbCycle + 1) / self.UCB_crossover.numbers_of_mutation[i])
-                upper_bound = average_reward + delta_i
+
+
+                upper_bound = Decimal(average_reward) + Decimal(delta_i)
             else:
-                upper_bound = 1e400
+                upper_bound = Decimal(1e400)
             if upper_bound > max_upper_bound:
                 max_upper_bound = upper_bound
                 crossover_selected = i
@@ -744,7 +749,7 @@ class AEPermutation:
             if self.UCB_mutator.numbers_of_mutation[i] > 10:
                 average_reward = self.UCB_mutator.sums_of_reward[i] / self.UCB_mutator.numbers_of_mutation[i]
                 delta_i = math.sqrt(2 * math.log(self.nbCycle + 1) / self.UCB_mutator.numbers_of_mutation[i])
-                upper_bound = average_reward + delta_i
+                upper_bound = Decimal(average_reward) + Decimal(delta_i)
             else:
                 upper_bound = 1e400
             if upper_bound > max_upper_bound:
@@ -999,8 +1004,8 @@ class AEPermutation:
 
     # method who evaluate the current children
     def evaluatechildren(self):
-        self.Childrens.fitness = self.fitness(self.Childrens)
         self.Childrens.cab = self.CAB(self.Childrens)
+        self.Childrens.fitness = self.fitness(self.Childrens)
         return
 
     # method who return index of Best value of fitness in population

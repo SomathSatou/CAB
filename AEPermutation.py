@@ -185,7 +185,8 @@ class AEPermutation:
             1 : self.CAB,
             2 : self.fitness1,
             3 : self.fitness2,
-            4 : self.fitness3
+            4 : self.fitness3,
+            5 : self.fitness4
         }
         self.functionEval = self.fitSwitch.get(self.fitnessType, lambda: self.fitness1)
 
@@ -243,7 +244,7 @@ class AEPermutation:
                 self.quickEval.append(Decimal(1) / Decimal(self.Size * pow(2, 0)))
                 for i in range(1, self.limits + 1):
                     self.quickEval.append(Decimal(1) / Decimal((self.Size * pow(2, i)))+self.quickEval[i-1])
-            elif self.functionEval.__name__ == "fitness3":
+            elif (self.functionEval.__name__ == "fitness3") or (self.functionEval.__name__ == "fitness4"):
                 self.minimize = False
                 for i in range(0, self.limits + 1):
                     self.quickEval.append(0)
@@ -878,7 +879,7 @@ class AEPermutation:
 
         if self.functionEval.__name__ == "fitness2":
             deltafitness += deltaCAB - individu.cab
-        if self.functionEval.__name__ == "fitness3":
+        if self.functionEval.__name__ == "fitness3" :
             card = 0
             for A in range(0, len(self.data)):
                 if len(self.data[A]) != 0:
@@ -886,7 +887,14 @@ class AEPermutation:
             newfitness = deltaCAB + ((individu.weightCount[deltaCAB]+self.aux[deltaCAB]) / card)
 
             deltafitness = newfitness-oldfitness
+        if self.functionEval.__name__ == "fitness4":
+            card = 0
+            for A in range(0, len(self.data)):
+                if len(self.data[A]) != 0:
+                    card += len(self.data[A])
+            newfitness = deltaCAB + 1 -((individu.weightCount[deltaCAB]+self.aux[deltaCAB]) / card)
 
+            deltafitness = newfitness-oldfitness
         delta.append(deltafitness)
         delta.append(deltaCAB)
         return delta
@@ -954,7 +962,7 @@ class AEPermutation:
         return ret
 
     # evaluation function provide by the papers "Adaptive evaluation functions for the cyclic bandwidth problem" f1
-    # and equation (3) in work document
+    # and equation (4) in work document
     def fitness1(self, elt):
         ret = 0
         for i in range(1, self.limits+1):
@@ -963,7 +971,7 @@ class AEPermutation:
         return ret
 
     # evaluation function provide by the papers "Adaptive evaluation functions for the cyclic bandwidth problem" f3
-    # and equation (5) in work document
+    # and equation (6) in work document
     def fitness2(self, elt):
         ret = elt.cab
         for i in range(1, self.limits+1):
@@ -984,7 +992,7 @@ class AEPermutation:
         return ret
 
     # evaluation function provide by the papers "An Iterated Three-Phase Search Approach forSolving the Cyclic Bandwidth Problem" fe
-    # and equation (7) in work document
+    # and equation (8) in work document
     def fitness3(self, elt):
         ret = elt.cab
         card = 0
@@ -994,6 +1002,19 @@ class AEPermutation:
 
         #comment(elt.weightCount)
         ret += elt.weightCount[ret]/card # ret here have CAB value
+        return ret
+
+    # evaluation function provide by the papers "An Iterated Three-Phase Search Approach forSolving the Cyclic Bandwidth Problem" fe
+    # and equation (9) in work document
+    def fitness4(self, elt):
+        ret = elt.cab
+        card = 0
+        for A in range(0, len(self.data)):
+            if len(self.data[A]) != 0:
+                card += len(self.data[A])
+
+        #comment(elt.weightCount)
+        ret += 1 - elt.weightCount[ret]/card # ret here have CAB value
         return ret
 
     # method for end case of algorithm

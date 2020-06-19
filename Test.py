@@ -43,7 +43,7 @@ def testFitness(function):
         for i in range(1, instance.limits + 1):
             instance.quickEval.append(Decimal(1) / Decimal((instance.Size * pow(2, i))) + instance.quickEval[i - 1])
 
-    elif function == 4:
+    elif function > 4:
         instance.minimize = False
         instance.quickEval = [0] * (instance.limits+1)
 

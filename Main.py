@@ -125,7 +125,7 @@ for o, a in opts:
         tmp = a.split(',')
         if len(tmp) != 5:
             help()
-            debug("mwrong number of method")
+            debug("wrong number of method")
             sys.exit()
         newlist = []
         for elt in tmp:
@@ -138,7 +138,7 @@ for o, a in opts:
         tmp = a.split(',')
         if len(tmp) != 5:
             help()
-            debug("mwrong number of options for display")
+            debug("wrong number of options for display")
             sys.exit()
         newlist = []
         for elt in tmp:
@@ -150,6 +150,8 @@ for o, a in opts:
         displayCrosover = newlist[4]
     elif o in ("-s", "--seed"):
         seedMax = int(a)
+    elif o in ("-v", "--verbose"):
+        debug("verbose  not implemented yet")
     elif o in ("-t", "--test"):
         testFitness(int(a))
         #testCab()

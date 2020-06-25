@@ -282,7 +282,7 @@ class AEPermutation:
                 # graph Value
                 self.nbCycle = self.nbCycle + 1
                 affichage = "nombre de tour effectuer : " + str(self.nbCycle) + "/" + str(self.nbCycleMax)
-                print(affichage)
+                #print(affichage)
                 # ajouter
                 self.x.append(self.nbCycle)
                 if self.minimize:

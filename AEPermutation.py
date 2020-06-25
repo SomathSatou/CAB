@@ -298,7 +298,7 @@ class AEPermutation:
 
 
         # part for write result in file
-        fichier = open("/home/tsaout/CAB/output/"+ self.name + Label + ".txt", "a")
+        fichier = open("/home/tsaout/CAB/output/"+ self.name +","+ Label + ".txt", "a")
 
         for elt in self.y:
             fichier.write(str(elt) + ";")

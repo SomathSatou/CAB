@@ -18,7 +18,7 @@ class Parser:
         content = []
         tmp = path.split("/")
         self.name = tmp[-1][:-4]
-        debug(self.name)
+        #debug(self.name)
         with open(path) as f:
             content = f.readlines()
             content = [x.strip() for x in content]

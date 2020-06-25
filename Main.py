@@ -171,9 +171,8 @@ Seed = 9001
 
 
 for i in range(0,seedMax):
-    print('debut des test pour la seed ' + str(Seed))
-    np.random.seed(Seed)
-    Seed += 1
+    #print('debut des test pour la seed ' + str(Seed))
+    np.random.seed(Seed+i)
 
     #testFitness(2)
     # initialisation de la population

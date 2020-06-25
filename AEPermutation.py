@@ -193,6 +193,8 @@ class AEPermutation:
         # initialise data struc for best solution
         self.Best = Individu(0)
 
+        #name of instances
+        self.name = data.name
 
     def launch(self, methodList, displayMoy, displayCab, displayFitness,
                displayMutator, displayCrossover):
@@ -249,7 +251,7 @@ class AEPermutation:
                 for i in range(0, self.limits + 1):
                     self.quickEval.append(0)
 
-            debug(self.quickEval)
+            #debug(self.quickEval)
             # evaluate initial population
             self.evaluate()
 
@@ -296,7 +298,7 @@ class AEPermutation:
 
 
         # part for write result in file
-        fichier = open("/home/tsaout/CAB/output/"+Label + ".txt", "a")
+        fichier = open("/home/tsaout/CAB/output/"+ self.name + Label + ".txt", "a")
 
         for elt in self.y:
             fichier.write(str(elt) + ";")

@@ -8,6 +8,7 @@ class Parser:
         self.edges = []
         self.StEn = []
         self.Size = 0
+        self.name = ""
         #self.numEdges = 0
         return
 
@@ -15,6 +16,9 @@ class Parser:
     def load(self, path):
         start_time = time.time()
         content = []
+        tmp = path.split("/")
+        self.name = tmp[-1][:-4]
+        debug(self.name)
         with open(path) as f:
             content = f.readlines()
             content = [x.strip() for x in content]

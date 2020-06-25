@@ -14,10 +14,6 @@
 
 RANGE=($(ls -1 /home/tsaout/CAB/*))
 
-PARAM_VALUE=${RANGE[$SLURM_ARRAY_TASK_ID]}
-
-echo "c instance $PARAM_VALUE"
-
-srun grep "c " $PARAM_VALUE ; grep "p " $PARAM_VALUE ; grep -v "p " $PARAM_VALUE | grep -v "c " &
+srun python3 Main
 
 wait

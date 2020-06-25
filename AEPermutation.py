@@ -243,7 +243,7 @@ class AEPermutation:
                     self.quickEval.append(pow(delta * (self.limits - i + 1), 5))
             elif self.functionEval.__name__ == "fitness2":
                 self.minimize = False
-                self.quickEval.append(Decimal(1) / Decimal(self.Size * pow(2, 0)))
+                self.quickEval.append(Decimal(0))
                 for i in range(1, self.limits + 1):
                     self.quickEval.append(Decimal(1) / Decimal((self.Size * pow(2, i)))+self.quickEval[i-1])
             elif (self.functionEval.__name__ == "fitness3") or (self.functionEval.__name__ == "fitness4"):
@@ -566,8 +566,6 @@ class AEPermutation:
             if self.UCB_crossover.numbers_of_mutation[i] > 10:
                 average_reward = self.UCB_crossover.sums_of_reward[i] / self.UCB_crossover.numbers_of_mutation[i]
                 delta_i = math.sqrt(2 * math.log(self.nbCycle + 1) / self.UCB_crossover.numbers_of_mutation[i])
-
-
                 upper_bound = Decimal(average_reward) + Decimal(delta_i)
             else:
                 upper_bound = Decimal(1e400)
@@ -645,8 +643,8 @@ class AEPermutation:
                 newcw = min(neww, self.Size - neww)
                 self.aux[oldcw] = self.aux[oldcw] - 1
                 self.aux[newcw] = self.aux[newcw] + 1
-                self.affected.append(oldcw);
-                self.affected.append(newcw);
+                self.affected.append(oldcw)
+                self.affected.append(newcw)
 
         for elt in self.data[B]:
             if not self.Childrens[elt] == A:
@@ -656,8 +654,8 @@ class AEPermutation:
                 newcw = min(neww, self.Size - neww)
                 self.aux[oldcw] = self.aux[oldcw] - 1
                 self.aux[newcw] = self.aux[newcw] + 1
-                self.affected.append(oldcw);
-                self.affected.append(newcw);
+                self.affected.append(oldcw)
+                self.affected.append(newcw)
 
         tmp = self.Childrens[A]
         self.Childrens[A] = self.Childrens[B]

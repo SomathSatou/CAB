@@ -252,8 +252,8 @@ class AEPermutation:
                 for i in range(1, self.limits + 1):
                     self.quickEval.append(pow(delta * (self.limits - i + 1), 5))
                 # data for normalize reward for ucb
-                self.min = self.quickEval[1] * self.edges
-                self.max = self.quickEval[-1] * self.edges
+                self.min = self.quickEval[-1] * self.edges
+                self.max = self.quickEval[1] * self.edges
             elif self.functionEval.__name__ == "fitness2":
                 self.minimize = False
                 self.quickEval.append(Decimal(1) / Decimal(self.Size * pow(2, 0)))
@@ -317,7 +317,9 @@ class AEPermutation:
 
 
         # part for write result in file
-        fichier = open("/home/tsaout/CAB/output/"+ self.name +","+ Label + ".txt", "a")
+        fichier = open("../output/"+ self.name +","+ Label + ".txt", "a")
+        # for cluster
+        #fichier = open("/home/tsaout/CAB/output/"+ self.name +","+ Label + ".txt", "a")
 
         for elt in self.y:
             fichier.write(str(elt) + ";")
@@ -362,6 +364,17 @@ class AEPermutation:
             plt.show()
             plt.clf()
 
+            for i in range(0, self.UCB_mutator.NbrOP):
+                title = self.mutSwitch.get(i + 1, lambda: self.crossoverUCB).__name__
+                plt.plot(self.x, self.UCB_mutator.utilisation[i], label=title)
+
+            plt.ylabel("nombre d'utilisation")
+            plt.xlabel("Nombre d'itération")
+
+            plt.legend()
+            plt.show()
+            plt.clf()
+
         if displayCrossover:
             for i in range(0, self.UCB_crossover.NbrOP):
                 title = self.recSwitch.get(i + 1, lambda: self.mutatorUCB).__name__
@@ -373,6 +386,19 @@ class AEPermutation:
             plt.legend()
             plt.show()
             plt.clf()
+
+            for i in range(0, self.UCB_crossover.NbrOP):
+                title = self.recSwitch.get(i + 1, lambda: self.mutatorUCB).__name__
+                plt.plot(self.x, self.UCB_crossover.utilisation[i], label=title)
+
+            plt.ylabel("nombre d'utilisation")
+            plt.xlabel("Nombre d'itération")
+
+            plt.legend()
+            plt.show()
+            plt.clf()
+
+
 
         print("La meilleur solution que l'algorithme as trouvé est :\n\t" + str(self.Best.label))
         print("elle as un cab = "+ str(self.Best.cab))
@@ -578,6 +604,8 @@ class AEPermutation:
         childs = parents[0]
         meanParentsEval = (parents[0].fitness + parents[1].fitness) / 2
 
+        #normalize
+        meanParentsEval = (meanParentsEval - self.min)/(self.max - self.min)
         crossover_selected = 0
         max_upper_bound = -1e400
 
@@ -585,8 +613,6 @@ class AEPermutation:
             if self.UCB_crossover.numbers_of_mutation[i] > 10:
                 average_reward = self.UCB_crossover.sums_of_reward[i] / self.UCB_crossover.numbers_of_mutation[i]
                 delta_i = math.sqrt(2 * math.log(self.nbCycle + 1) / self.UCB_crossover.numbers_of_mutation[i])
-
-
                 upper_bound = Decimal(average_reward) + Decimal(delta_i)
             else:
                 upper_bound = Decimal(1e400)
@@ -597,18 +623,19 @@ class AEPermutation:
         tmp = self.recSwitch.get(crossover_selected + 1, lambda: self.crossover)
         #comment(tmp.__name__)
         childs = tmp(parents)
-        reward = self.fitness(childs) - meanParentsEval
+        reward = (self.fitness(childs) - self.min)/(self.max - self.min) - meanParentsEval
         #comment('crossover reward = '+ str(reward))
         if self.minimize:
             self.UCB_crossover.sums_of_reward[crossover_selected] -= reward
         else:
             self.UCB_crossover.sums_of_reward[crossover_selected] += reward
-
         for i in range(0,self.UCB_crossover.NbrOP):
             self.UCB_crossover.output[i].append(
                 self.UCB_crossover.sums_of_reward[i] / (self.UCB_crossover.numbers_of_mutation[i]+1)
             )
-            self.UCB_crossover.utilisation[i].append(self.UCB_crossover.numbers_of_mutation)
+            self.UCB_crossover.utilisation[i].append(self.UCB_crossover.numbers_of_mutation[i])
+
+
         return childs
 
     # endregion Recombination
@@ -762,7 +789,7 @@ class AEPermutation:
 
     def mutatorUCB(self):
         self.evaluatechildren()
-        OldChildrenEval = self.Childrens.fitness
+        OldChildrenEval = (self.Childrens.fitness - self.min)/(self.max - self.min)
         #debug(self.Childrens.fitness)
         mutation_selected = 0
         max_upper_bound = -1e400
@@ -785,7 +812,7 @@ class AEPermutation:
 
         self.evaluatechildren()
         #debug(self.Childrens.fitness)
-        reward = self.Childrens.fitness - OldChildrenEval
+        reward = (self.Childrens.fitness- self.min)/(self.max - self.min) - OldChildrenEval
         #debug('mutator reward = '+ str(reward))
 
         if self.minimize:
@@ -796,7 +823,7 @@ class AEPermutation:
             self.UCB_mutator.output[i].append(
                 self.UCB_mutator.sums_of_reward[i] / (self.UCB_mutator.numbers_of_mutation[i]+1)
             )
-            self.UCB_mutator.utilisation[i].append(self.UCB_mutator.numbers_of_mutation)
+            self.UCB_mutator.utilisation[i].append(self.UCB_mutator.numbers_of_mutation[i])
 
         return
 

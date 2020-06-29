@@ -112,7 +112,8 @@ class AEPermutation:
             4: self.partialRandom,
             5: self.bitSwap,
             6: self.localSearchNaivePermutation,
-            7: self.mutatorUCB
+            7: self.mutatorUCB,
+            8: self.nothing
         }
 
         # for selection operator
@@ -132,7 +133,8 @@ class AEPermutation:
             2: self.Pmx,
             3: self.edge,
             4: self.cycle,
-            5: self.crossoverUCB
+            5: self.crossoverUCB,
+            6: self.coupleUCB
         }
 
         # for insertion operator
@@ -170,6 +172,7 @@ class AEPermutation:
         # see class UCB for more info
         self.UCB_mutator = UCB(6)
         self.UCB_crossover = UCB(4)
+        self.UCB_couple = UCB(6*4)
 
         # initialize data struc for partial evaluation
         self.quickEval = []
@@ -197,7 +200,7 @@ class AEPermutation:
         self.name = data.name
 
     def launch(self, methodList, displayMoy, displayCab, displayFitness,
-               displayMutator, displayCrossover):
+               displayMutator, displayCrossover, displayCouple):
         # execute genetic algorithm
 
         # this for is for test many couple of operator with same seed
@@ -295,8 +298,9 @@ class AEPermutation:
                     self.cab.append(self.Population[self.CurrentBest()].cab)
                 self.moyY.append(self.mean())
 
-
-
+        # part for write result in file
+        #for test
+        fichier =
         # part for write result in file
         fichier = open("/home/tsaout/CAB/output/"+ self.name +","+ Label + ".txt", "a")
 
@@ -347,6 +351,18 @@ class AEPermutation:
             for i in range(0, self.UCB_crossover.NbrOP):
                 title = self.recSwitch.get(i + 1, lambda: self.mutatorUCB).__name__
                 plt.plot(self.x, self.UCB_crossover.output[i], label=title)
+
+            plt.ylabel("Valeur moyenne de récompense pour l'opérateur")
+            plt.xlabel("Nombre d'itération")
+
+            plt.legend()
+            plt.show()
+            plt.clf()
+
+        if displayCouple:
+            for i in range(0, self.UCB_couple.NbrOP):
+                title = self.recSwitch.get((i//6) + 1, lambda: self.mutatorUCB).__name__+", "+ self.mutSwitch.get((i%6) + 1, lambda: self.crossoverUCB).__name__
+                plt.plot(self.x, self.UCB_couple.output[i], label=title)
 
             plt.ylabel("Valeur moyenne de récompense pour l'opérateur")
             plt.xlabel("Nombre d'itération")
@@ -590,6 +606,43 @@ class AEPermutation:
             self.UCB_crossover.utilisation[i].append(self.UCB_crossover.numbers_of_mutation)
         return childs
 
+    def coupleUCB(self, parents):
+        childs = parents[0]
+        meanParentsEval = (parents[0].fitness + parents[1].fitness) / 2
+
+        couple_selected = 0
+        max_upper_bound = -1e400
+
+        for i in range(0, self.UCB_couple.NbrOP):
+            if self.UCB_couple.numbers_of_mutation[i] > 10:
+                average_reward = self.UCB_couple.sums_of_reward[i] / self.UCB_couple.numbers_of_mutation[i]
+                delta_i = math.sqrt(2 * math.log(self.nbCycle + 1) / self.UCB_couple.numbers_of_mutation[i])
+                upper_bound = Decimal(average_reward) + Decimal(delta_i)
+            else:
+                upper_bound = Decimal(1e400)
+            if upper_bound > max_upper_bound:
+                max_upper_bound = upper_bound
+                couple_selected = i
+        self.UCB_couple.numbers_of_mutation[couple_selected] += 1
+        tmp = self.recSwitch.get((couple_selected//6)+1, lambda: self.crossover)
+        # comment(tmp.__name__)
+        self.Childrens = tmp(parents)
+        tmp = self.mutSwitch.get((couple_selected%6)+1, lambda: self.crossover)
+        tmp()
+
+        reward = self.fitness(childs) - meanParentsEval
+        # comment('crossover reward = '+ str(reward))
+        if self.minimize:
+            self.UCB_couple.sums_of_reward[couple_selected] -= reward
+        else:
+            self.UCB_couple.sums_of_reward[couple_selected] += reward
+
+        for i in range(0, self.UCB_couple.NbrOP):
+            self.UCB_couple.output[i].append(
+                self.UCB_couple.sums_of_reward[i] / (self.UCB_couple.numbers_of_mutation[i] + 1)
+            )
+            self.UCB_couple.utilisation[i].append(self.UCB_couple.numbers_of_mutation)
+        return childs
     # endregion Recombination
 
     # region Mutation
@@ -716,6 +769,10 @@ class AEPermutation:
             self.updateWeightCountRange(A,B, olds)
 
         return
+
+    def nothing(self):
+        return
+
 
     # region local research
     def localSearchNaivePermutation(self):

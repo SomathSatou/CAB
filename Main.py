@@ -74,9 +74,9 @@ displayCrossover = True
 #big instance
 #file = '../Dataset/Instances/hypercube11.rnd'
 #test instance
-#file = '../Dataset/Instances/mesh2D5x25.rnd'
+file = '../Dataset/Instances/mesh2D5x25.rnd'
 #path for cluster
-file = '/home/tsaout/CAB/Dataset/Instances/mesh2D5x25.rnd'
+#file = '/home/tsaout/CAB/Dataset/Instances/mesh2D5x25.rnd'
 
 #[mutation, selection, crossover, reinsertion, fintness]
 #test mimimize
@@ -138,7 +138,7 @@ for o, a in opts:
             minimize = False
     elif o in ("-d", "--displayList"):
         tmp = a.split(',')
-        if len(tmp) != 5:
+        if len(tmp) != 6:
             help()
             debug("wrong number of options for display")
             sys.exit()
@@ -150,6 +150,7 @@ for o, a in opts:
         displayFitness = newlist[2]
         displayMutator = newlist[3]
         displayCrosover = newlist[4]
+        displayCouple = newlist[5]
     elif o in ("-s", "--seed"):
         seedMax = int(a)
     elif o in ("-v", "--verbose"):
@@ -179,4 +180,4 @@ for i in range(0,seedMax):
     Run = AEPermutation(loader, P, M, C, CMax)
 
     Run.launch(methodList, displayMoy, displayCab, displayFitness,
-               displayMutator, displayCrossover)
+               displayMutator, displayCrossover, displayCouple)

@@ -61,15 +61,16 @@ def help():
 P = 100 # taille de ma population
 M = 80 # probabilité de mutation
 C = 50 #probabilité de croissement
-CMax = 10000 # nombre limite d'itérations pour l'algoritme
+CMax = 100000 # nombre limite d'itérations pour l'algoritme
 seedMax = 1
 
 # display parameters
 displayMoy = True
 displayCab = True
 displayFitness = True
-displayMutator = True
-displayCrossover = True
+displayMutator = False
+displayCrossover = False
+displayCouple = True
 
 #big instance
 #file = '../Dataset/Instances/hypercube11.rnd'
@@ -82,7 +83,13 @@ file = '../Dataset/Instances/mesh2D5x25.rnd'
 #test mimimize
 #methodList = [[7, 4, 5, 5, 2]]
 #test maximize
-methodList = [[7, 3, 5, 4, 3]]
+#methodList = [[7, 3, 5, 4, 3]]
+
+#test couple
+#test mimimize
+#methodList = [[8, 4, 6, 5, 2]]
+#test maximize
+methodList = [[8, 3, 6, 4, 5]]
 try:
     opts, args = getopt.getopt(sys.argv[1:], "hp:m:c:i:f:l:d:s:vt:", ["help",
                                                            "population=",

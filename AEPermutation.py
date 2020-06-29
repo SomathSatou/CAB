@@ -399,14 +399,56 @@ class AEPermutation:
             plt.show()
             plt.clf()
 
-
-
         if displayCouple:
             for i in range(0, self.UCB_couple.NbrOP):
                 title = self.recSwitch.get((i//6) + 1, lambda: self.mutatorUCB).__name__+", "+ self.mutSwitch.get((i%6) + 1, lambda: self.crossoverUCB).__name__
                 plt.plot(self.x, self.UCB_couple.output[i], label=title)
 
             plt.ylabel("Valeur moyenne de récompense pour l'opérateur")
+            plt.xlabel("Nombre d'itération")
+
+            plt.legend()
+            plt.show()
+            plt.clf()
+
+            for i in range(0, 6):
+                title = self.recSwitch.get((i//6) + 1, lambda: self.mutatorUCB).__name__+", "+ self.mutSwitch.get((i%6) + 1, lambda: self.crossoverUCB).__name__
+                plt.plot(self.x, self.UCB_couple.utilisation[i], label=title)
+
+            plt.ylabel("nombre d'utilisation")
+            plt.xlabel("Nombre d'itération")
+
+            plt.legend()
+            plt.show()
+            plt.clf()
+
+            for i in range(6, 12):
+                title = self.recSwitch.get((i//6) + 1, lambda: self.mutatorUCB).__name__+", "+ self.mutSwitch.get((i%6) + 1, lambda: self.crossoverUCB).__name__
+                plt.plot(self.x, self.UCB_couple.utilisation[i], label=title)
+
+            plt.ylabel("nombre d'utilisation")
+            plt.xlabel("Nombre d'itération")
+
+            plt.legend()
+            plt.show()
+            plt.clf()
+
+            for i in range(12, 18):
+                title = self.recSwitch.get((i//6) + 1, lambda: self.mutatorUCB).__name__+", "+ self.mutSwitch.get((i%6) + 1, lambda: self.crossoverUCB).__name__
+                plt.plot(self.x, self.UCB_couple.utilisation[i], label=title)
+
+            plt.ylabel("nombre d'utilisation")
+            plt.xlabel("Nombre d'itération")
+
+            plt.legend()
+            plt.show()
+            plt.clf()
+
+            for i in range(18, 24):
+                title = self.recSwitch.get((i//6) + 1, lambda: self.mutatorUCB).__name__+", "+ self.mutSwitch.get((i%6) + 1, lambda: self.crossoverUCB).__name__
+                plt.plot(self.x, self.UCB_couple.utilisation[i], label=title)
+
+            plt.ylabel("nombre d'utilisation")
             plt.xlabel("Nombre d'itération")
 
             plt.legend()
@@ -654,6 +696,8 @@ class AEPermutation:
     def coupleUCB(self, parents):
         childs = parents[0]
         meanParentsEval = (parents[0].fitness + parents[1].fitness) / 2
+        # normalize
+        meanParentsEval = (meanParentsEval - self.min)/(self.max - self.min)
 
         couple_selected = 0
         max_upper_bound = -1e400
@@ -675,7 +719,7 @@ class AEPermutation:
         tmp = self.mutSwitch.get((couple_selected%6)+1, lambda: self.crossover)
         tmp()
 
-        reward = self.fitness(childs) - meanParentsEval
+        reward = (self.fitness(childs) - self.min)/(self.max - self.min) - meanParentsEval
         # comment('crossover reward = '+ str(reward))
         if self.minimize:
             self.UCB_couple.sums_of_reward[couple_selected] -= reward
@@ -686,7 +730,7 @@ class AEPermutation:
             self.UCB_couple.output[i].append(
                 self.UCB_couple.sums_of_reward[i] / (self.UCB_couple.numbers_of_mutation[i] + 1)
             )
-            self.UCB_couple.utilisation[i].append(self.UCB_couple.numbers_of_mutation)
+            self.UCB_couple.utilisation[i].append(self.UCB_couple.numbers_of_mutation[i])
         return childs
     # endregion Recombination
 

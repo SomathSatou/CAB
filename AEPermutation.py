@@ -17,6 +17,7 @@ class UCB:
     def __init__(self, NbrOP):
         self.NbrOP = NbrOP
         self.sums_of_reward = [0] * self.NbrOP
+        self.normalize_reward = [0] * self.NbrOP
         self.numbers_of_mutation = [0] * self.NbrOP
         self.output = []
         for i in range(0, self.NbrOP):
@@ -196,6 +197,10 @@ class AEPermutation:
         #name of instances
         self.name = data.name
 
+        # data for normalize UCB
+        self.min = 0
+        self.max = 0
+
     def launch(self, methodList, displayMoy, displayCab, displayFitness,
                displayMutator, displayCrossover):
         # execute genetic algorithm
@@ -227,10 +232,15 @@ class AEPermutation:
             self.functionEval = self.fitSwitch.get(self.fitnessType, lambda: self.fitness1)
             Label += self.functionEval.__name__
 
+
+
             # set correct value for quickEval and minimize
             if self.functionEval.__name__ == "CAB":
                 self.minimize = False
-                self.quickEval = [0] * (self.Size+1 // 2)
+                self.quickEval = [0] * (self.limits+1)
+                # data for normalize reward for ucb
+                self.min = 1
+                self.max = self.limits
             elif self.functionEval.__name__ == "fitness1":
                 self.minimize = True
                 self.Best.fitness = 1e400
@@ -241,15 +251,24 @@ class AEPermutation:
                 self.quickEval.append(pow(delta * (self.limits - 0 + 1), 5))
                 for i in range(1, self.limits + 1):
                     self.quickEval.append(pow(delta * (self.limits - i + 1), 5))
+                # data for normalize reward for ucb
+                self.min = self.quickEval[1] * self.edges
+                self.max = self.quickEval[-1] * self.edges
             elif self.functionEval.__name__ == "fitness2":
                 self.minimize = False
                 self.quickEval.append(Decimal(1) / Decimal(self.Size * pow(2, 0)))
                 for i in range(1, self.limits + 1):
                     self.quickEval.append(Decimal(1) / Decimal((self.Size * pow(2, i)))+self.quickEval[i-1])
+                # data for normalize reward for ucb
+                self.min = 1
+                self.max = self.limits
             elif (self.functionEval.__name__ == "fitness3") or (self.functionEval.__name__ == "fitness4"):
                 self.minimize = False
                 for i in range(0, self.limits + 1):
                     self.quickEval.append(0)
+                # data for normalize reward for ucb
+                self.min = 1
+                self.max = self.limits
 
             #debug(self.quickEval)
             # evaluate initial population

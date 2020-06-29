@@ -30,8 +30,8 @@ class Parser:
 
             for i in range(0,self.Size):
                 self.data.append([])
-                self.edges.append([])
 
+            self.edges = 0
             last = 0
 
             # reading and stocking of edges from the file
@@ -39,6 +39,7 @@ class Parser:
                 line = content[i].split(' ')
                 self.data[int(line[0])-1].append(int(line[1])-1)
                 self.data[int(line[1])-1].append(int(line[0])-1)
+                self.edges += 1
 
             print("loading complete in %s seconds" % (time.time() - start_time ))
         return

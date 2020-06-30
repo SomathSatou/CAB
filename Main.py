@@ -175,16 +175,14 @@ loader = Parser()
 loader.load(file)
 
 # default seed
-Seed = 9001
+Seed = 9000
 
+#print('debut des test pour la seed ' + str(Seed))
+np.random.seed(Seed+seedMax)
 
-for i in range(0,seedMax):
-    #print('debut des test pour la seed ' + str(Seed))
-    np.random.seed(Seed+i)
+#testFitness(2)
+# initialisation de la population
+Run = AEPermutation(loader, P, M, C, CMax)
 
-    #testFitness(2)
-    # initialisation de la population
-    Run = AEPermutation(loader, P, M, C, CMax)
-
-    Run.launch(methodList, displayMoy, displayCab, displayFitness,
-               displayMutator, displayCrossover, displayCouple)
+Run.launch(methodList, displayMoy, displayCab, displayFitness,
+           displayMutator, displayCrossover, displayCouple)

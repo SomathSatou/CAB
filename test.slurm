@@ -22,3 +22,4 @@ echo "groupe témoin"
 echo "srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,1,4,1" -d "0,0,0,0,0,0" -s 50"
 
 wait
+done

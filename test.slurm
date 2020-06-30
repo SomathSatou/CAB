@@ -9,7 +9,7 @@
 #SBATCH --output=%x-%A-%a.out
 #SBATCH --error=%x-%A-%a.err
 #SBATCH --array=0-59
-#SBATCH --time=10
+#SBATCH --time=60
 #SBATCH --signal=SIGINT@30
 
 PATHS= "/home/tsaout/CAB/Dataset/Instances/"

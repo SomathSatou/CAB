@@ -324,7 +324,7 @@ class AEPermutation:
         # part for write result in file
         #fichier = open("../output/time_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        fichier = open("/home/tsaout/CAB/output/"+ self.name +","+ Label + ".txt", "a")
+        fichier = open("/home/tsaout/CAB/output/time_"+ self.name +","+ Label + ".txt", "a")
 
         for elt in self.y:
             fichier.write(str(time.time() - start_time) + ";")
@@ -332,7 +332,7 @@ class AEPermutation:
         fichier.write("\n")
         fichier.close()
 
-        #fichier = open("../output/"+ self.name +","+ Label + ".txt", "a")
+        #fichier = open("../output/fitness"+ self.name +","+ Label + ".txt", "a")
         # for cluster
         fichier = open("/home/tsaout/CAB/output/"+ self.name +","+ Label + ".txt", "a")
 
@@ -358,7 +358,7 @@ class AEPermutation:
         # for cluster
         fichier = open("/home/tsaout/CAB/output/Best_"+ self.name +","+ Label + ".txt", "a")
 
-        fichier.write(str(self.Best.cab) + ";"+self.bestTime+";"+self.Best.label)
+        fichier.write(str(self.Best.cab) + ";"+str(self.bestTime)+";"+str(self.Best.label))
 
         fichier.write("\n")
         fichier.close()

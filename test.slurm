@@ -19,29 +19,29 @@ do
 CHEMIN= "${PATHS}${VARIABLE}"
 
 echo "groupe témoin"
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "1,3,1,4,1" -d "0,0,0,0,0" -s 50
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "1,4,1,5,2" -d "0,0,0,0,0" -s 50
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "1,3,1,4,3" -d "0,0,0,0,0" -s 50
-srub python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "1,3,1,4,4" -d "0,0,0,0,0" -s 50
-srub python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "1,3,1,4,5" -d "0,0,0,0,0" -s 50
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,1,4,1" -d "0,0,0,0,0,0" -s 50
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,4,1,5,2" -d "0,0,0,0,0,0" -s 50
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,1,4,3" -d "0,0,0,0,0,0" -s 50
+srub python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,1,4,4" -d "0,0,0,0,0,0" -s 50
+srub python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,1,4,5" -d "0,0,0,0,0,0" -s 50
 
 echo "Crossover"
-srub python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "1,4,5,5,2" -d "0,0,0,0,0" -s 50
-srub python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "1,3,5,4,3" -d "0,0,0,0,0" -s 50
-srub python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "1,3,5,4,5" -d "0,0,0,0,0" -s 50
+srub python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,4,5,5,2" -d "0,0,0,0,0,0" -s 50
+srub python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,5,4,3" -d "0,0,0,0,0,0" -s 50
+srub python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,5,4,5" -d "0,0,0,0,0,0" -s 50
 
 echo "Mutator"
-srub python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "7,4,1,5,2" -d "0,0,0,0,0" -s 50
-srub python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "7,3,1,4,3" -d "0,0,0,0,0" -s 50
-srub python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "7,3,1,4,5" -d "0,0,0,0,0" -s 50
+srub python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "7,4,1,5,2" -d "0,0,0,0,0,0" -s 50
+srub python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "7,3,1,4,3" -d "0,0,0,0,0,0" -s 50
+srub python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "7,3,1,4,5" -d "0,0,0,0,0,0" -s 50
 
 echo "duo UCB"
-srub python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "7,4,5,5,2" -d "0,0,0,0,0" -s 50
-srub python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "7,3,5,4,3" -d "0,0,0,0,0" -s 50
-srub python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "7,3,5,4,5" -d "0,0,0,0,0" -s 50
+srub python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "7,4,5,5,2" -d "0,0,0,0,0,0" -s 50
+srub python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "7,3,5,4,3" -d "0,0,0,0,0,0" -s 50
+srub python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "7,3,5,4,5" -d "0,0,0,0,0,0" -s 50
 
 echo "Couple"
-srub python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "8,4,6,5,2" -d "0,0,0,0,0" -s 50
-srub python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "8,3,6,4,3" -d "0,0,0,0,0" -s 50
-srub python3.7 Main.py -p 100 -m 80 -c 50 -i 1000 -f $CHEMIN -l "8,3,6,4,5" -d "0,0,0,0,0" -s 50
+srub python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "8,4,6,5,2" -d "0,0,0,0,0,0" -s 50
+srub python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "8,3,6,4,3" -d "0,0,0,0,0,0" -s 50
+srub python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "8,3,6,4,5" -d "0,0,0,0,0,0" -s 50
 wait

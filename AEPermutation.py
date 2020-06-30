@@ -298,7 +298,7 @@ class AEPermutation:
 
                 # Save best Solution
                 if self.minimize:
-                    if (self.Best.fitness > self.Population[self.CurrentLow()].fitness) and (self.Best.cab >= self.Population[self.CurrentLow()].cab):
+                    if (self.Best.fitness > self.Population[self.CurrentLow()].fitness) and (self.Best.cab <= self.Population[self.CurrentLow()].cab):
                         self.Best = self.Population[self.CurrentLow()].copyIndividu()
                         self.bestTime = self.nbCycle
                 else:

@@ -6,8 +6,8 @@
 #SBATCH --nodes=1
 #SBATCH --partition=intel-E5-2695
 #SBATCH --mem-per-cpu=256
-#SBATCH --output=%x-%A-%a.out
-#SBATCH --error=%x-%A-%a.err
+#SBATCH --output=cluster/output/%x-%A-%a.out
+#SBATCH --error=cluster/error/%x-%A-%a.err
 #SBATCH --array=0-59
 #SBATCH --time=60
 #SBATCH --signal=SIGINT@30

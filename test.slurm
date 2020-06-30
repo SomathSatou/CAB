@@ -7,7 +7,7 @@
 #SBATCH --partition=intel-E5-2695
 #SBATCH --mem-per-cpu=256
 #SBATCH --output=cluster/output/%x-%A-%a.out
-#SBATCH --error=cluster/error/%x-%A-%a.err
+#SBATCH --error=cluster/error/cluster%x-%A-%a.err
 #SBATCH --array=0-59
 #SBATCH --time=60
 #SBATCH --signal=SIGINT@30
@@ -20,7 +20,7 @@ do
 CHEMIN="${PATHS}${VARIABLE}"
 
 echo $CHEMIN
-echo "srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,1,4,1" -d "0,0,0,0,0,0" -s 50"
+echo "srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,1,4,1" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID"
 
 wait
 done

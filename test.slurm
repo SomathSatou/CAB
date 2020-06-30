@@ -12,13 +12,13 @@
 #SBATCH --time=60
 #SBATCH --signal=SIGINT@30
 
-PATHS= "/home/tsaout/CAB/Dataset/Instances"
+PATHS= "/home/tsaout/CAB/Dataset/Instances/"
 
 for VARIABLE in $(ls -1 /home/tsaout/CAB/Dataset/Instances)
 do
-CHEMIN= "${PATHS}/${VARIABLE}"
+CHEMIN= "${PATHS}${VARIABLE}"
 
-echo "groupe témoin"
+echo $CHEMIN
 echo "srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,1,4,1" -d "0,0,0,0,0,0" -s 50"
 
 wait

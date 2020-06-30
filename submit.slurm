@@ -9,7 +9,7 @@
 #SBATCH --output=cluster/output/%x-%A-%a.out
 #SBATCH --error=cluster/error/cluster%x-%A-%a.err
 #SBATCH --array=1-50
-#SBATCH --time=120
+#SBATCH --time=150
 #SBATCH --signal=SIGINT@30
 
 PATHS="/home/tsaout/CAB/Dataset/Instances/"

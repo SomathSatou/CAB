@@ -12,7 +12,7 @@
 #SBATCH --time=60
 #SBATCH --signal=SIGINT@30
 
-PATHS= "/home/tsaout/CAB/Dataset/Instances/"
+PATHS="/home/tsaout/CAB/Dataset/Instances/"
 
 for VARIABLE in $(ls -1 /home/tsaout/CAB/Dataset/Instances)
 do

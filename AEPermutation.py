@@ -196,6 +196,7 @@ class AEPermutation:
 
         # initialise data struc for best solution
         self.Best = Individu(0)
+        self.bestTime =0
 
         #name of instances
         self.name = data.name
@@ -207,7 +208,7 @@ class AEPermutation:
     def launch(self, methodList, displayMoy, displayCab, displayFitness,
                displayMutator, displayCrossover, displayCouple):
         # execute genetic algorithm
-
+        start_time = time.time()
         # this for is for test many couple of operator with same seed
         for methodElt in methodList:
             self.nbCycle = 0
@@ -297,11 +298,14 @@ class AEPermutation:
 
                 # Save best Solution
                 if self.minimize:
-                    if self.Best.fitness > self.Population[self.CurrentLow()].fitness:
+                    if (self.Best.fitness > self.Population[self.CurrentLow()].fitness) and (self.Best.cab >= self.Population[self.CurrentLow()].cab):
                         self.Best = self.Population[self.CurrentLow()].copyIndividu()
+                        self.bestTime = self.nbCycle
                 else:
-                    if self.Best.fitness < self.Population[self.CurrentBest()].fitness:
+                    if (self.Best.fitness < self.Population[self.CurrentBest()].fitness) and (self.Best.cab <= self.Population[self.CurrentLow()].cab):
                         self.Best = self.Population[self.CurrentBest()].copyIndividu()
+                        self.bestTime = self.nbCycle
+
 
                 # graph Value
                 self.nbCycle = self.nbCycle + 1
@@ -316,8 +320,18 @@ class AEPermutation:
                     self.y.append(self.Population[self.CurrentBest()].fitness)
                     self.cab.append(self.Population[self.CurrentBest()].cab)
                 self.moyY.append(self.mean())
-
+        # region write
         # part for write result in file
+        fichier = open("../output/time_" + self.name + "," + Label + ".txt", "a")
+        # for cluster
+        # fichier = open("/home/tsaout/CAB/output/"+ self.name +","+ Label + ".txt", "a")
+
+        for elt in self.y:
+            fichier.write(str(time.time() - start_time) + ";")
+
+        fichier.write("\n")
+        fichier.close()
+
         fichier = open("../output/"+ self.name +","+ Label + ".txt", "a")
         # for cluster
         #fichier = open("/home/tsaout/CAB/output/"+ self.name +","+ Label + ".txt", "a")
@@ -328,6 +342,42 @@ class AEPermutation:
         fichier.write("\n")
         fichier.close()
 
+        #moyenne
+        fichier = open("../output/Mean_" + self.name + "," + Label + ".txt", "a")
+        # for cluster
+        # fichier = open("/home/tsaout/CAB/output/Mean_"+ self.name +","+ Label + ".txt", "a")
+
+        for elt in self.moyY:
+            fichier.write(str(elt) + ";")
+
+        fichier.write("\n")
+        fichier.close()
+
+        #best
+        fichier = open("../output/Best_" + self.name + "," + Label + ".txt", "a")
+        # for cluster
+        # fichier = open("/home/tsaout/CAB/output/Best_"+ self.name +","+ Label + ".txt", "a")
+
+        fichier.write(str(self.Best.cab) + ";"+self.bestTime+";"+self.Best.label)
+
+        fichier.write("\n")
+        fichier.close()
+
+        fichier = open("../output/mutatorUCB_" + self.name + "," + Label + ".txt", "a")
+        # for cluster
+        # fichier = open("/home/tsaout/CAB/output/mutatorUCB_"+ self.name +","+ Label + ".txt", "a")
+
+        for elt in self.UCB_mutator.output:
+            fichier.write(str(elt) + ";")
+        fichier.write("\n")
+        for elt in self.UCB_mutator.utilisation:
+            fichier.write(str(elt) + ";")
+        fichier.write("\n")
+        fichier.write("\n")
+        fichier.close()
+        # endregion write
+
+        # region display
         # part for diplay
         if displayFitness:
             plt.plot(self.x, self.y, label=Label)
@@ -454,6 +504,7 @@ class AEPermutation:
             plt.legend()
             plt.show()
             plt.clf()
+        # endregion display
 
         print("La meilleur solution que l'algorithme as trouvé est :\n\t" + str(self.Best.label))
         print("elle as un cab = "+ str(self.Best.cab))

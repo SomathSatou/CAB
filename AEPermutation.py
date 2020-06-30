@@ -322,9 +322,9 @@ class AEPermutation:
                 self.moyY.append(self.mean())
         # region write
         # part for write result in file
-        fichier = open("../output/time_" + self.name + "," + Label + ".txt", "a")
+        #fichier = open("../output/time_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        # fichier = open("/home/tsaout/CAB/output/"+ self.name +","+ Label + ".txt", "a")
+        fichier = open("/home/tsaout/CAB/output/"+ self.name +","+ Label + ".txt", "a")
 
         for elt in self.y:
             fichier.write(str(time.time() - start_time) + ";")
@@ -332,9 +332,9 @@ class AEPermutation:
         fichier.write("\n")
         fichier.close()
 
-        fichier = open("../output/"+ self.name +","+ Label + ".txt", "a")
+        #fichier = open("../output/"+ self.name +","+ Label + ".txt", "a")
         # for cluster
-        #fichier = open("/home/tsaout/CAB/output/"+ self.name +","+ Label + ".txt", "a")
+        fichier = open("/home/tsaout/CAB/output/"+ self.name +","+ Label + ".txt", "a")
 
         for elt in self.y:
             fichier.write(str(elt) + ";")
@@ -343,9 +343,9 @@ class AEPermutation:
         fichier.close()
 
         #moyenne
-        fichier = open("../output/Mean_" + self.name + "," + Label + ".txt", "a")
+        #fichier = open("../output/Mean_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        # fichier = open("/home/tsaout/CAB/output/Mean_"+ self.name +","+ Label + ".txt", "a")
+        fichier = open("/home/tsaout/CAB/output/Mean_"+ self.name +","+ Label + ".txt", "a")
 
         for elt in self.moyY:
             fichier.write(str(elt) + ";")
@@ -354,23 +354,51 @@ class AEPermutation:
         fichier.close()
 
         #best
-        fichier = open("../output/Best_" + self.name + "," + Label + ".txt", "a")
+        #fichier = open("../output/Best_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        # fichier = open("/home/tsaout/CAB/output/Best_"+ self.name +","+ Label + ".txt", "a")
+        fichier = open("/home/tsaout/CAB/output/Best_"+ self.name +","+ Label + ".txt", "a")
 
         fichier.write(str(self.Best.cab) + ";"+self.bestTime+";"+self.Best.label)
 
         fichier.write("\n")
         fichier.close()
 
-        fichier = open("../output/mutatorUCB_" + self.name + "," + Label + ".txt", "a")
+        #fichier = open("../output/mutatorUCB_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        # fichier = open("/home/tsaout/CAB/output/mutatorUCB_"+ self.name +","+ Label + ".txt", "a")
+        fichier = open("/home/tsaout/CAB/output/mutatorUCB_"+ self.name +","+ Label + ".txt", "a")
 
         for elt in self.UCB_mutator.output:
             fichier.write(str(elt) + ";")
         fichier.write("\n")
         for elt in self.UCB_mutator.utilisation:
+            fichier.write(str(elt) + ";")
+        fichier.write("\n")
+        fichier.write("\n")
+        fichier.close()
+        # endregion write
+
+        #fichier = open("../output/crossoverUCB_" + self.name + "," + Label + ".txt", "a")
+        # for cluster
+        fichier = open("/home/tsaout/CAB/output/crossoverUCB_"+ self.name +","+ Label + ".txt", "a")
+
+        for elt in self.UCB_crossover.output:
+            fichier.write(str(elt) + ";")
+        fichier.write("\n")
+        for elt in self.UCB_crossover.utilisation:
+            fichier.write(str(elt) + ";")
+        fichier.write("\n")
+        fichier.write("\n")
+        fichier.close()
+        # endregion write
+
+        #fichier = open("../output/coupleUCB_" + self.name + "," + Label + ".txt", "a")
+        # for cluster
+        fichier = open("/home/tsaout/CAB/output/coupleUCB_"+ self.name +","+ Label + ".txt", "a")
+
+        for elt in self.UCB_couple.output:
+            fichier.write(str(elt) + ";")
+        fichier.write("\n")
+        for elt in self.UCB_couple.utilisation:
             fichier.write(str(elt) + ";")
         fichier.write("\n")
         fichier.write("\n")

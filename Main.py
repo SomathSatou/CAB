@@ -75,9 +75,9 @@ displayCouple = True
 #big instance
 #file = '../Dataset/Instances/hypercube11.rnd'
 #test instance
-file = '../Dataset/Instances/mesh2D5x25.rnd'
+#file = '../Dataset/Instances/mesh2D5x25.rnd'
 #path for cluster
-#file = '/home/tsaout/CAB/Dataset/Instances/mesh2D5x25.rnd'
+file = '/home/tsaout/CAB/Dataset/Instances/mesh2D5x25.rnd'
 
 #[mutation, selection, crossover, reinsertion, fintness]
 #test mimimize

@@ -85,7 +85,7 @@ class Individu:
 class AEPermutation:
     getcontext().prec = 40
     # its the controler in this algorithm
-    def __init__(self, data, pop, mut, rec, nbcMax):
+    def __init__(self, data, pop, mut, rec, nbcMax, path):
         # method for initialize data structure
 
         # region Parameters
@@ -204,6 +204,8 @@ class AEPermutation:
         # data for normalize UCB
         self.min = 0
         self.max = 0
+
+        self.path = path
 
     def launch(self, methodList, displayMoy, displayCab, displayFitness,
                displayMutator, displayCrossover, displayCouple):
@@ -324,7 +326,7 @@ class AEPermutation:
         # part for write result in file
         #fichier = open("../output/time_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        fichier = open("/home/tsaout/CAB/output/time_"+ self.name +","+ Label + ".txt", "a")
+        fichier = open(self.path+"/output/time_"+ self.name +","+ Label + ".txt", "a")
 
         for elt in self.y:
             fichier.write(str(time.time() - start_time) + ";")
@@ -332,9 +334,9 @@ class AEPermutation:
         fichier.write("\n")
         fichier.close()
 
-        #fichier = open("../output/fitness"+ self.name +","+ Label + ".txt", "a")
+        #fichier = open("..//output/fitness"+ self.name +","+ Label + ".txt", "a")
         # for cluster
-        fichier = open("/home/tsaout/CAB/output/"+ self.name +","+ Label + ".txt", "a")
+        fichier = open(self.path+"/output/"+ self.name +","+ Label + ".txt", "a")
 
         for elt in self.y:
             fichier.write(str(elt) + ";")
@@ -343,9 +345,9 @@ class AEPermutation:
         fichier.close()
 
         #moyenne
-        #fichier = open("../output/Mean_" + self.name + "," + Label + ".txt", "a")
+        #fichier = open("..//output/Mean_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        fichier = open("/home/tsaout/CAB/output/Mean_"+ self.name +","+ Label + ".txt", "a")
+        fichier = open(self.path+"/output/Mean_"+ self.name +","+ Label + ".txt", "a")
 
         for elt in self.moyY:
             fichier.write(str(elt) + ";")
@@ -356,7 +358,7 @@ class AEPermutation:
         #best
         #fichier = open("../output/Best_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        fichier = open("/home/tsaout/CAB/output/Best_"+ self.name +","+ Label + ".txt", "a")
+        fichier = open(self.path+"/output/Best_"+ self.name +","+ Label + ".txt", "a")
 
         fichier.write(str(self.Best.cab) + ";"+str(self.bestTime)+";"+str(self.Best.label))
 
@@ -365,7 +367,7 @@ class AEPermutation:
 
         #fichier = open("../output/mutatorUCB_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        fichier = open("/home/tsaout/CAB/output/mutatorUCB_"+ self.name +","+ Label + ".txt", "a")
+        fichier = open(self.path+"/output/mutatorUCB_"+ self.name +","+ Label + ".txt", "a")
 
         for elt in self.UCB_mutator.output:
             fichier.write(str(elt) + ";")
@@ -379,7 +381,7 @@ class AEPermutation:
 
         #fichier = open("../output/crossoverUCB_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        fichier = open("/home/tsaout/CAB/output/crossoverUCB_"+ self.name +","+ Label + ".txt", "a")
+        fichier = open(self.path+"/output/crossoverUCB_"+ self.name +","+ Label + ".txt", "a")
 
         for elt in self.UCB_crossover.output:
             fichier.write(str(elt) + ";")
@@ -393,7 +395,7 @@ class AEPermutation:
 
         #fichier = open("../output/coupleUCB_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        fichier = open("/home/tsaout/CAB/output/coupleUCB_"+ self.name +","+ Label + ".txt", "a")
+        fichier = open(self.path+"/output/coupleUCB_"+ self.name +","+ Label + ".txt", "a")
 
         for elt in self.UCB_couple.output:
             fichier.write(str(elt) + ";")
@@ -744,7 +746,7 @@ class AEPermutation:
         max_upper_bound = -1e400
 
         for i in range(0, self.UCB_crossover.NbrOP):
-            if self.UCB_crossover.numbers_of_mutation[i] > 10:
+            if self.UCB_crossover.numbers_of_mutation[i] > 1:
                 average_reward = self.UCB_crossover.sums_of_reward[i] / self.UCB_crossover.numbers_of_mutation[i]
                 delta_i = math.sqrt(2 * math.log(self.nbCycle + 1) / self.UCB_crossover.numbers_of_mutation[i])
                 upper_bound = Decimal(average_reward) + Decimal(delta_i)
@@ -779,10 +781,10 @@ class AEPermutation:
         meanParentsEval = (meanParentsEval - self.min)/(self.max - self.min)
 
         couple_selected = 0
-        max_upper_bound = -1e400
+        max_upper_bound = Decimal(-1e400)
 
         for i in range(0, self.UCB_couple.NbrOP):
-            if self.UCB_couple.numbers_of_mutation[i] > 10:
+            if self.UCB_couple.numbers_of_mutation[i] > 1:
                 average_reward = self.UCB_couple.sums_of_reward[i] / self.UCB_couple.numbers_of_mutation[i]
                 delta_i = math.sqrt(2 * math.log(self.nbCycle + 1) / self.UCB_couple.numbers_of_mutation[i])
                 upper_bound = Decimal(average_reward) + Decimal(delta_i)
@@ -972,7 +974,7 @@ class AEPermutation:
         max_upper_bound = -1e400
 
         for i in range(0, self.UCB_mutator.NbrOP):
-            if self.UCB_mutator.numbers_of_mutation[i] > 10:
+            if self.UCB_mutator.numbers_of_mutation[i] > 1:
                 average_reward = self.UCB_mutator.sums_of_reward[i] / self.UCB_mutator.numbers_of_mutation[i]
                 delta_i = math.sqrt(2 * math.log(self.nbCycle + 1) / self.UCB_mutator.numbers_of_mutation[i])
                 upper_bound = Decimal(average_reward) + Decimal(delta_i)

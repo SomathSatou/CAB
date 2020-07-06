@@ -9,7 +9,7 @@
 #SBATCH --output=cluster/output/%x-%A-%a.out
 #SBATCH --error=cluster/error/cluster%x-%A-%a.err
 #SBATCH --array=1-50
-#SBATCH --time=150
+#SBATCH --time=1200
 #SBATCH --signal=SIGINT@30
 
 PATHS="/home/tsaout/CAB/Dataset/Instances/"
@@ -20,30 +20,30 @@ do
 CHEMIN="${PATHS}${VARIABLE}"
 
 echo "groupe témoin"
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,1,4,1" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,4,1,5,2" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,1,4,3" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,1,4,4" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,1,4,5" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 100000 -c -f $CHEMIN -l "1,3,1,4,1" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 100000 -c -f $CHEMIN -l "1,4,1,5,2" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 100000 -c -f $CHEMIN -l "1,3,1,4,3" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 100000 -c -f $CHEMIN -l "1,3,1,4,4" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 100000 -c -f $CHEMIN -l "1,3,1,4,5" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
 
 echo "Crossover"
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,4,5,5,2" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,5,4,3" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "1,3,5,4,5" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 100000 -c -f $CHEMIN -l "1,4,5,5,2" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 100000 -c -f $CHEMIN -l "1,3,5,4,3" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 100000 -c -f $CHEMIN -l "1,3,5,4,5" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
 
 echo "Mutator"
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "7,4,1,5,2" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "7,3,1,4,3" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "7,3,1,4,5" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 100000 -c -f $CHEMIN -l "7,4,1,5,2" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 100000 -c -f $CHEMIN -l "7,3,1,4,3" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 100000 -c -f $CHEMIN -l "7,3,1,4,5" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
 
 echo "duo UCB"
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "7,4,5,5,2" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "7,3,5,4,3" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "7,3,5,4,5" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 100000 -c -f $CHEMIN -l "7,4,5,5,2" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 100000 -c -f $CHEMIN -l "7,3,5,4,3" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 100000 -c -f $CHEMIN -l "7,3,5,4,5" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
 
 echo "Couple"
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "8,4,6,5,2" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "8,3,6,4,3" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
-srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -f $CHEMIN -l "8,3,6,4,5" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -c -f $CHEMIN -l "8,4,6,5,2" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -c -f $CHEMIN -l "8,3,6,4,3" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -c -f $CHEMIN -l "8,3,6,4,5" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
 wait
 done

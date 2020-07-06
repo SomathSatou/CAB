@@ -75,9 +75,11 @@ displayCouple = True
 #big instance
 #file = '../Dataset/Instances/hypercube11.rnd'
 #test instance
-#file = '../Dataset/Instances/mesh2D5x25.rnd'
+path = '..'
+file = path+'/Dataset/Instances/3dmesh_3.txt'
 #path for cluster
-file = '/home/tsaout/CAB/Dataset/Instances/mesh2D5x25.rnd'
+#path = /home/tsaout/CAB
+#file = path+'/Dataset/Instances/mesh2D5x25.rnd'
 
 #[mutation, selection, crossover, reinsertion, fintness]
 #test mimimize
@@ -91,7 +93,7 @@ file = '/home/tsaout/CAB/Dataset/Instances/mesh2D5x25.rnd'
 #test maximize
 methodList = [[8, 3, 6, 4, 5]]
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "hp:m:c:i:f:l:d:s:vt:", ["help",
+    opts, args = getopt.getopt(sys.argv[1:], "hp:m:c:i:cf:l:d:s:vt:", ["help",
                                                            "population=",
                                                            "mutation=",
                                                            "crossover=",
@@ -128,6 +130,8 @@ for o, a in opts:
         C = int(a)
     elif o in ("-i", "--iteration"):
         CMax = int(a)
+    elif 0 in ("-c", "--cluster"):
+        path = '/home/tsaout/CAB'
     elif o in ("-f", "--file"):
         file = str(a)
     elif o in ("-l", "--methodList"):
@@ -182,7 +186,7 @@ np.random.seed(Seed+seedMax)
 
 #testFitness(2)
 # initialisation de la population
-Run = AEPermutation(loader, P, M, C, CMax)
+Run = AEPermutation(loader, P, M, C, CMax, path)
 
 Run.launch(methodList, displayMoy, displayCab, displayFitness,
            displayMutator, displayCrossover, displayCouple)

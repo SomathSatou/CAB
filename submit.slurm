@@ -4,7 +4,7 @@
 #SBATCH --mail-type=end,fail
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1
-#SBATCH --partition=intel-E5-2695
+#SBATCH --partition=amd-opteron-4184
 #SBATCH --mem-per-cpu=256
 #SBATCH --output=cluster/output/%x-%A-%a.out
 #SBATCH --error=cluster/error/cluster%x-%A-%a.err

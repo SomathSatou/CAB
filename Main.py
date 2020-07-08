@@ -93,7 +93,7 @@ file = path+'/Dataset/Instances/3dmesh_3.txt'
 #test maximize
 methodList = [[8, 3, 6, 4, 5]]
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "hp:m:c:i:cf:l:d:s:vt:", ["help",
+    opts, args = getopt.getopt(sys.argv[1:], "hp:m:c:i:uf:l:d:s:vt:", ["help",
                                                            "population=",
                                                            "mutation=",
                                                            "crossover=",
@@ -130,10 +130,10 @@ for o, a in opts:
         C = int(a)
     elif o in ("-i", "--iteration"):
         CMax = int(a)
-    elif 0 in ("-c", "--cluster"):
+    elif 0 in ("-u", "--cluster"):
         path = '/home/tsaout/CAB'
     elif o in ("-f", "--file"):
-        file = str(a)
+        file = astr(a)
     elif o in ("-l", "--methodList"):
         tmp = a.split(',')
         if len(tmp) != 5:

@@ -171,7 +171,7 @@ for o, a in opts:
         #testCab()
         exit(0)
     else:
-        assert False, "unhandled option"
+        assert False, "unhandled option "+o
 
 #testFitness(3)
 # function for load file

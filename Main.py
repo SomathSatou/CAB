@@ -130,7 +130,7 @@ for o, a in opts:
         C = int(a)
     elif o in ("-i", "--iteration"):
         CMax = int(a)
-    elif 0 in ("-u", "--cluster"):
+    elif o in ("-u", "--cluster"):
         path = '/home/tsaout/CAB'
     elif o in ("-f", "--file"):
         file = astr(a)

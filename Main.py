@@ -133,7 +133,7 @@ for o, a in opts:
     elif o in ("-u", "--cluster"):
         path = '/home/tsaout/CAB'
     elif o in ("-f", "--file"):
-        file = astr(a)
+        file = str(a)
     elif o in ("-l", "--methodList"):
         tmp = a.split(',')
         if len(tmp) != 5:

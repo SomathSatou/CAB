@@ -131,8 +131,8 @@ for o, a in opts:
     elif o in ("-i", "--iteration"):
         CMax = int(a)
     elif o in ("-u", "--cluster"):
-        #path = '/home/tsaout/CAB'
-        path = '/home/ettignon/CAB'
+        path = '/home/tsaout/CAB'
+        #path = '/home/ettignon/CAB'
     elif o in ("-f", "--file"):
         file = str(a)
     elif o in ("-l", "--methodList"):

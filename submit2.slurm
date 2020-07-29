@@ -12,10 +12,10 @@
 #SBATCH --time=14400
 #SBATCH --signal=SIGINT@30
 
-PATHS="/home/tsaout/CAB/Dataset/Instances1/"
+PATHS="/home/tsaout/CAB/Dataset/Instances2/"
 echo $PATHs
 
-for VARIABLE in $(ls -1 /home/ettigon/CAB/Dataset/Instances1)
+for VARIABLE in $(ls -1 /home/tsaout/CAB/Dataset/Instances2)
 do
 CHEMIN="${PATHS}${VARIABLE}"
 

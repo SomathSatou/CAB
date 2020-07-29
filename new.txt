@@ -1,3 +1,34 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:0af984b23ff218ff66d82de68a2f9e8ced8e7a0a163b70f63de5862e00db29fe
-size 2344
+3dmesh_3,twoBestIn5Random,coupleUCB,nothing,worst,fitness2.txt
+3dmesh_3,twoBestIn5Random,coupleUCB,nothing,worst,fitness4.txt
+3dmesh_3,twoBestIn5Random,crossover,mutatorUCB,worst,fitness2.txt
+3dmesh_3,twoBestIn5Random,crossover,mutatorUCB,worst,fitness4.txt
+3dmesh_3,twoBestIn5Random,crossover,swap,worst,CAB.txt
+3dmesh_3,twoBestIn5Random,crossover,swap,worst,fitness2.txt
+3dmesh_3,twoBestIn5Random,crossover,swap,worst,fitness3.txt
+3dmesh_3,twoBestIn5Random,crossover,swap,worst,fitness4.txt
+3dmesh_3,twoBestIn5Random,crossoverUCB,mutatorUCB,worst,fitness2.txt
+3dmesh_3,twoBestIn5Random,crossoverUCB,mutatorUCB,worst,fitness4.txt
+3dmesh_3,twoBestIn5Random,crossoverUCB,swap,worst,fitness2.txt
+3dmesh_3,twoBestIn5Random,crossoverUCB,swap,worst,fitness4.txt
+3dmesh_3,twoLowIn5Random,coupleUCB,nothing,best,fitness1.txt
+3dmesh_3,twoLowIn5Random,crossover,mutatorUCB,best,fitness1.txt
+3dmesh_3,twoLowIn5Random,crossover,swap,best,fitness1.txt
+3dmesh_3,twoLowIn5Random,crossoverUCB,mutatorUCB,best,fitness1.txt
+3dmesh_3,twoLowIn5Random,crossoverUCB,swap,best,fitness1.txt
+1:3dmesh_3,twoBestIn5Random,coupleUCB,nothing,worst,fitness2.txt
+2:3dmesh_3,twoBestIn5Random,coupleUCB,nothing,worst,fitness4.txt
+3:3dmesh_3,twoBestIn5Random,crossover,mutatorUCB,worst,fitness2.txt
+4:3dmesh_3,twoBestIn5Random,crossover,mutatorUCB,worst,fitness4.txt
+5:3dmesh_3,twoBestIn5Random,crossover,swap,worst,CAB.txt
+6:3dmesh_3,twoBestIn5Random,crossover,swap,worst,fitness2.txt
+7:3dmesh_3,twoBestIn5Random,crossover,swap,worst,fitness3.txt
+8:3dmesh_3,twoBestIn5Random,crossover,swap,worst,fitness4.txt
+9:3dmesh_3,twoBestIn5Random,crossoverUCB,mutatorUCB,worst,fitness2.txt
+10:3dmesh_3,twoBestIn5Random,crossoverUCB,mutatorUCB,worst,fitness4.txt
+11:3dmesh_3,twoBestIn5Random,crossoverUCB,swap,worst,fitness2.txt
+12:3dmesh_3,twoBestIn5Random,crossoverUCB,swap,worst,fitness4.txt
+13:3dmesh_3,twoLowIn5Random,coupleUCB,nothing,best,fitness1.txt
+14:3dmesh_3,twoLowIn5Random,crossover,mutatorUCB,best,fitness1.txt
+15:3dmesh_3,twoLowIn5Random,crossover,swap,best,fitness1.txt
+16:3dmesh_3,twoLowIn5Random,crossoverUCB,mutatorUCB,best,fitness1.txt
+17:3dmesh_3,twoLowIn5Random,crossoverUCB,swap,best,fitness1.txt

@@ -333,7 +333,6 @@ class AEPermutation:
                 fichier.write(str(time.time() - start_time) + ";")
 
             fichier.write("\n")
-            fichier.close()
             fcntl.flock(fichier, fcntl.LOCK_UN)
 
         #fichier = open("..//output/fitness"+ self.name +","+ Label + ".txt", "a")
@@ -344,7 +343,6 @@ class AEPermutation:
                 fichier.write(str(elt) + ";")
 
             fichier.write("\n")
-            fichier.close()
             fcntl.flock(fichier, fcntl.LOCK_UN)
 
         #moyenne
@@ -356,7 +354,6 @@ class AEPermutation:
                 fichier.write(str(elt) + ";")
 
             fichier.write("\n")
-            fichier.close()
             fcntl.flock(fichier, fcntl.LOCK_UN)
 
         #best
@@ -367,7 +364,6 @@ class AEPermutation:
             fichier.write(str(self.Best.cab) + ";"+str(self.bestTime)+";"+str(self.Best.label))
 
             fichier.write("\n")
-            fichier.close()
             fcntl.flock(fichier, fcntl.LOCK_UN)
 
         #fichier = open("../output/mutatorUCB_" + self.name + "," + Label + ".txt", "a")
@@ -381,7 +377,6 @@ class AEPermutation:
                 fichier.write(str(elt) + ";")
             fichier.write("\n")
             fichier.write("\n")
-            fichier.close()
             fcntl.flock(fichier, fcntl.LOCK_UN)
 
         #fichier = open("../output/crossoverUCB_" + self.name + "," + Label + ".txt", "a")
@@ -395,7 +390,6 @@ class AEPermutation:
                 fichier.write(str(elt) + ";")
             fichier.write("\n")
             fichier.write("\n")
-            fichier.close()
             fcntl.flock(fichier, fcntl.LOCK_UN)
 
 
@@ -410,7 +404,6 @@ class AEPermutation:
                 fichier.write(str(elt) + ";")
             fichier.write("\n")
             fichier.write("\n")
-            fichier.close()
             fcntl.flock(fichier, fcntl.LOCK_UN)
 
         # endregion write

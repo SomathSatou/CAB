@@ -5,6 +5,7 @@ from decimal import *
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+import fcntl
 
 from output import *
 
@@ -326,85 +327,92 @@ class AEPermutation:
         # part for write result in file
         #fichier = open("../output/time_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        fichier = open(self.path+"/output/time_"+ self.name +","+ Label + ".txt", "a")
+        with open(self.path+"/output/time_"+ self.name +","+ Label + ".txt", "a") as fichier:
+            fcntl.flock(fichier, fcntl.LOCK_EX)
+            for elt in self.y:
+                fichier.write(str(time.time() - start_time) + ";")
 
-        for elt in self.y:
-            fichier.write(str(time.time() - start_time) + ";")
-
-        fichier.write("\n")
-        fichier.close()
+            fichier.write("\n")
+            fichier.close()
+            fcntl.flock(fichier, fcntl.LOCK_UN)
 
         #fichier = open("..//output/fitness"+ self.name +","+ Label + ".txt", "a")
         # for cluster
-        fichier = open(self.path+"/output/"+ self.name +","+ Label + ".txt", "a")
+        with open(self.path+"/output/"+ self.name +","+ Label + ".txt", "a") as fichier:
+            fcntl.flock(fichier, fcntl.LOCK_EX)
+            for elt in self.y:
+                fichier.write(str(elt) + ";")
 
-        for elt in self.y:
-            fichier.write(str(elt) + ";")
-
-        fichier.write("\n")
-        fichier.close()
+            fichier.write("\n")
+            fichier.close()
+            fcntl.flock(fichier, fcntl.LOCK_UN)
 
         #moyenne
         #fichier = open("..//output/Mean_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        fichier = open(self.path+"/output/Mean_"+ self.name +","+ Label + ".txt", "a")
+        with open(self.path+"/output/Mean_"+ self.name +","+ Label + ".txt", "a") as fichier:
+            fcntl.flock(fichier, fcntl.LOCK_EX)
+            for elt in self.moyY:
+                fichier.write(str(elt) + ";")
 
-        for elt in self.moyY:
-            fichier.write(str(elt) + ";")
-
-        fichier.write("\n")
-        fichier.close()
+            fichier.write("\n")
+            fichier.close()
+            fcntl.flock(fichier, fcntl.LOCK_UN)
 
         #best
         #fichier = open("../output/Best_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        fichier = open(self.path+"/output/Best_"+ self.name +","+ Label + ".txt", "a")
+        with open(self.path+"/output/Best_"+ self.name +","+ Label + ".txt", "a") as fichier:
+            fcntl.flock(fichier, fcntl.LOCK_EX)
+            fichier.write(str(self.Best.cab) + ";"+str(self.bestTime)+";"+str(self.Best.label))
 
-        fichier.write(str(self.Best.cab) + ";"+str(self.bestTime)+";"+str(self.Best.label))
-
-        fichier.write("\n")
-        fichier.close()
+            fichier.write("\n")
+            fichier.close()
+            fcntl.flock(fichier, fcntl.LOCK_UN)
 
         #fichier = open("../output/mutatorUCB_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        fichier = open(self.path+"/output/mutatorUCB_"+ self.name +","+ Label + ".txt", "a")
-
-        for elt in self.UCB_mutator.output:
-            fichier.write(str(elt) + ";")
-        fichier.write("\n")
-        for elt in self.UCB_mutator.utilisation:
-            fichier.write(str(elt) + ";")
-        fichier.write("\n")
-        fichier.write("\n")
-        fichier.close()
-        # endregion write
+        with open(self.path+"/output/mutatorUCB_"+ self.name +","+ Label + ".txt", "a") as fichier:
+            fcntl.flock(fichier, fcntl.LOCK_EX)
+            for elt in self.UCB_mutator.output:
+                fichier.write(str(elt) + ";")
+            fichier.write("\n")
+            for elt in self.UCB_mutator.utilisation:
+                fichier.write(str(elt) + ";")
+            fichier.write("\n")
+            fichier.write("\n")
+            fichier.close()
+            fcntl.flock(fichier, fcntl.LOCK_UN)
 
         #fichier = open("../output/crossoverUCB_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        fichier = open(self.path+"/output/crossoverUCB_"+ self.name +","+ Label + ".txt", "a")
+        with open(self.path+"/output/crossoverUCB_"+ self.name +","+ Label + ".txt", "a") as fichier:
+            fcntl.flock(fichier, fcntl.LOCK_EX)
+            for elt in self.UCB_crossover.output:
+                fichier.write(str(elt) + ";")
+            fichier.write("\n")
+            for elt in self.UCB_crossover.utilisation:
+                fichier.write(str(elt) + ";")
+            fichier.write("\n")
+            fichier.write("\n")
+            fichier.close()
+            fcntl.flock(fichier, fcntl.LOCK_UN)
 
-        for elt in self.UCB_crossover.output:
-            fichier.write(str(elt) + ";")
-        fichier.write("\n")
-        for elt in self.UCB_crossover.utilisation:
-            fichier.write(str(elt) + ";")
-        fichier.write("\n")
-        fichier.write("\n")
-        fichier.close()
-        # endregion write
 
         #fichier = open("../output/coupleUCB_" + self.name + "," + Label + ".txt", "a")
         # for cluster
-        fichier = open(self.path+"/output/coupleUCB_"+ self.name +","+ Label + ".txt", "a")
+        with open(self.path+"/output/coupleUCB_"+ self.name +","+ Label + ".txt", "a") as fichier:
+            fcntl.flock(fichier, fcntl.LOCK_EX)
+            for elt in self.UCB_couple.output:
+                fichier.write(str(elt) + ";")
+            fichier.write("\n")
+            for elt in self.UCB_couple.utilisation:
+                fichier.write(str(elt) + ";")
+            fichier.write("\n")
+            fichier.write("\n")
+            fichier.close()
+            fcntl.flock(fichier, fcntl.LOCK_UN)
 
-        for elt in self.UCB_couple.output:
-            fichier.write(str(elt) + ";")
-        fichier.write("\n")
-        for elt in self.UCB_couple.utilisation:
-            fichier.write(str(elt) + ";")
-        fichier.write("\n")
-        fichier.write("\n")
-        fichier.close()
         # endregion write
 
         # region display

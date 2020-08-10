@@ -22,15 +22,15 @@ verbose = False
 
 # setting of paramaters
 for o, a in opts:
-    if o == "-f":
+    if o in ("-f", "--file"):
         path = str(a)
-    if o == "-n":
+    elif o in ("-n", "--nbrCycle"):
         nbrCycle = int(a)
-    if o == "-x":
+    elif o == "-x":
         xlabel = str(a)
-    if o == "-y":
+    elif o == "-y":
         ylabel = str(a)
-    if o == "-l":
+    elif o == "-l":
         label = str(a)
     else:
         assert False, "unhandled option "+o
@@ -42,8 +42,12 @@ y = []
 file = open(path)
 content = file.readlines()
 for line in content:
-    tab = eval(line)
-    for i in range(0, len(tab)):
+    tab = line.split(";")
+    for i in range(0, len(tab)-2):
+        print(len(tab))
+        print(len(temp))
+        osef = temp[i]
+        osef = tab[i]
         temp[i].append(tab[i])
 
 for elt in temp:

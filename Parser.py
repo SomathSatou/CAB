@@ -35,6 +35,7 @@ class Parser:
             last = 0
 
             # reading and stocking of edges from the file
+            
             for i in range(2, len(content)):
                 line = content[i].split(' ')
                 self.data[int(line[0])-1].append(int(line[1])-1)

@@ -43,11 +43,8 @@ file = open(path)
 content = file.readlines()
 for line in content:
     tab = line.split(";")
-    for i in range(0, len(tab)-2):
-        print(len(tab))
-        print(len(temp))
-        osef = temp[i]
-        osef = tab[i]
+    tab = tab[:-1]
+    for i in range(0, len(tab)-1):
         temp[i].append(tab[i])
 
 for elt in temp:

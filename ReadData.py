@@ -2,13 +2,16 @@ import getopt, sys
 import numpy as np
 import matplotlib.pyplot as plt
 from output import *
+from decimal import *
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "f:n:x:y:l:", ["file",
+    opts, args = getopt.getopt(sys.argv[1:], "f:n:x:y:l:m:s:", ["file",
                                                             "nbrCycle",
                                                             "xlabel",
                                                             "ylabel",
-                                                            "label"
+                                                            "label",
+                                                            "mean",
+                                                            "saveFile"
                                                             ])
 except getopt.GetoptError as err:
     # print help information and exit:
@@ -19,6 +22,10 @@ except getopt.GetoptError as err:
 # default value for diplay parameters
 output = None
 verbose = False
+moy = False
+
+label = ""
+getcontext().prec = 20
 
 # setting of paramaters
 for o, a in opts:
@@ -30,33 +37,64 @@ for o, a in opts:
         xlabel = str(a)
     elif o == "-y":
         ylabel = str(a)
-    elif o == "-l":
+    elif o in ("-l", "--label"):
         label = str(a)
+    elif o in ("-m", "--mean"):
+        chem = str(a)
+        moy = True
+    elif o in ("-s", "--saveFile"):
+        save = str(a)
     else:
         assert False, "unhandled option "+o
 
-x = range(1,nbrCycle,1)
-temp = [[]] * nbrCycle
+x = range(1,nbrCycle+1,1)
+temp = []
+for i in range(0,nbrCycle):
+    tmp = []
+    temp.append(tmp)
 y = []
 
 file = open(path)
 content = file.readlines()
+
 for line in content:
     tab = line.split(";")
-    for i in range(0, len(tab)-2):
-        print(len(tab))
-        print(len(temp))
-        osef = temp[i]
-        osef = tab[i]
-        temp[i].append(tab[i])
+    tab = tab[:-1]
+    for i in range(0, nbrCycle):
+        add = Decimal(tab[i])
+        temp[i].append(add)
 
 for elt in temp:
     y.append(np.mean(elt))
 
-    plt.plot(x, y, label=label)
-    plt.ylabel("Valeur de la function d'évaluation")
-    plt.xlabel("Nombre d'itération")
+plt.plot(x, y, label=label)
 
-    plt.legend()
-    plt.show()
-    plt.clf()
+if moy:
+    temp = []
+    for i in range(0, nbrCycle):
+        tmp = []
+        temp.append(tmp)
+    y = []
+
+    file = open(chem)
+    content = file.readlines()
+
+    for line in content:
+        tab = line.split(";")
+        tab = tab[:-1]
+        for i in range(0, nbrCycle):
+            add = Decimal(tab[i])
+            temp[i].append(add)
+
+    for elt in temp:
+        y.append(np.mean(elt))
+
+    plt.plot(x, y, label="mean")
+
+
+plt.ylabel(ylabel)
+plt.xlabel(xlabel)
+
+plt.legend()
+plt.savefig(save, dpi=750, bbox_inches='tight')
+plt.clf()

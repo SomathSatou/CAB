@@ -38,5 +38,6 @@ echo "Couple"
 srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -u -f $1 -l "8,4,6,5,2" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
 srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -u -f $1 -l "8,3,6,4,3" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
 srun python3.7 Main.py -p 100 -m 80 -c 50 -i 10000 -u -f $1 -l "8,3,6,4,5" -d "0,0,0,0,0,0" -s $SLURM_ARRAY_TASK_ID
+
 wait
 done

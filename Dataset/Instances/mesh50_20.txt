@@ -1930,4 +1930,3 @@ Problem name: mesh50x20.txt 	 Optimal solution = 490
 997 998
 998 999
 999 1000
-

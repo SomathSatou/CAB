@@ -3,48 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from output import *
 from decimal import *
-
-def Crossover(content):
-    global nbrOP, listLabel
-
-    x = range(1, nbrCycle + 1, 1)
-    temp = []
-    for i in range(0, nbrCycle):
-        tmp = []
-        temp.append(tmp)
-    y = []
-    for i in range(0,nbrOP-1):
-        tmp = []
-        y.append(tmp)
-
-    content = [elem for elem in content if elem != ""]
-
-    for i in range(0, len(content) - 1):
-        tab = np.load(content[i])
-        for i in range(0, nbrCycle):
-            add = Decimal(tab[i])
-            temp[i].append(add)
-
-        for elt in temp:
-            y[i % nbrOP].append(np.mean(elt))
-
-    for i in range(0, nbrOP - 1):
-        plt.plot(x, y[i], label=listLabel)
-    plt.ylabel(ylabel)
-    plt.xlabel(xlabel)
-
-    plt.legend()
-    plt.show()
-    #plt.savefig(save, dpi=750, bbox_inches='tight')
-    plt.clf()
-
-    return
-
-def Muatotor():
-    return
-
-def Couple():
-    return
+import itertools
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], "f:n:x:y:l:s:t:", ["file",
@@ -70,6 +29,7 @@ moy = False
 label = ""
 getcontext().prec = 20
 listLabel = []
+save = "error.png"
 
 # setting of paramaters
 for o, a in opts:
@@ -86,7 +46,7 @@ for o, a in opts:
     elif o in ("-s", "--saveFile"):
         save = str(a)
     elif o in ("-t", "--type"):
-        if str(a) in ("m", "mutator"):
+        if str(a) in ("mu", "mutator"):
             listLabel = ["swap", "flip", "slide", "partialRandom", "bitSwap", "localSearchNaivePermutation"]
         elif str(a) in ("cr", "crossover"):
             listLabel = ["crossover", "Pmx", "edge", "cycle"]
@@ -109,37 +69,55 @@ content = file.readlines()
 #    6 : Mutator,
 #    24 : Couple,
 #}
-
-x = range(1, nbrCycle + 1, 1)
-temp = []
-for i in range(0, nbrCycle):
-    tmp = []
-    temp.append(tmp)
-y = []
-for i in range(0, nbrOP - 1):
-    tmp = []
-    y.append(tmp)
-
-content = [elem for elem in content if elem != "\n"]
-
-for i in range(0, len(content) - 1):
-    line = content[i].plit(";")
+try:
+    x = range(1, nbrCycle + 1, 1)
+    temp = []
     for i in range(0, nbrCycle):
-        add = Decimal(tab[i])
-        temp[i].append(add)
+        tmp = []
+        temp.append(tmp)
+    y = []
+    for i in range(0, nbrOP):
+        tmp = []
+        y.append(tmp)
 
-    for elt in temp:
-        y[i % nbrOP].append(np.mean(elt))
+    content = [elem for elem in content if elem != "\n"]
 
-for i in range(0, nbrOP - 1):
-    plt.plot(x, y[i], label=listLabel)
-plt.ylabel(ylabel)
-plt.xlabel(xlabel)
+    data = []
+    for i in range(0, nbrOP):
+        tmp = []
+        data.append(tmp)
 
-plt.legend()
-plt.show()
-# plt.savefig(save, dpi=750, bbox_inches='tight')
-plt.clf()
+    for i in range(0, len(content) - 1, 2):
+        line1 = content[i].split(";")
+        line2 = content[i+1].split(";")
+        for j in range(0, nbrOP):
+            try:
+                data[j].append([float(a) / ((float(b)+1)/c) for a, b, c in zip(eval(line1[j]), eval(line2[j]), x)])
+            except SyntaxError:
+                j = len(content)-1
+            except IndexError:
+                j = len(content)-1
+
+    for i in range(0, nbrOP):
+        temp = data[i]
+        y[i] = [float(sum(col))/50 for col in itertools.zip_longest(*iter(temp))]
+        plt.plot(x, y[i], label=listLabel[i])
+
+    plt.ylabel(ylabel)
+    plt.xlabel(xlabel)
+
+    plt.legend(loc='upper right')
+    #plt.show()
+    plt.savefig(save, dpi=750, bbox_inches='tight')
+    comment(save)
+    plt.clf()
+except ValueError:
+    debug(path)
+    debug(nbrCycle)
+    debug(nbrOP)
+    debug(i)
+
+
 
 #select = typeSwitch.get(nbrOP, lambda: Crossover)
 #select(content)

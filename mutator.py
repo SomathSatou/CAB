@@ -27,11 +27,22 @@ listname = ["cycle_50",
             "caterpillar_10_6",
             "random-graph-250-01",
             "random-graph-750-05",
-            "D-dwt_503.mtx",
+            "R-dwt_503.mtx",
             "jgl009.mtx",
             "p1_100",
             "p21_200"
             ]
 
+listname = [
+    "3dmesh_2_2_3",
+    "3dmesh_4_4_68",
+    "662_bus.mtx",
+    "ash85.mtx",
+    "caterpillar_5_4",
+    "caterpillar_10_6",
+    "cbt_30",
+    "cbt_500"
+]
+
 for elt in listname:
-    os.system('./graph.sh '+elt)
+    os.system('./mutator.sh '+elt+'&')

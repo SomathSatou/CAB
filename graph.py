@@ -29,9 +29,12 @@ listname = ["cycle_50",
             "random-graph-750-05",
             "R-dwt_503.mtx",
             "jgl009.mtx",
-            "p1_100_200",
-            "p21_200_400"
+            "p1_100",
+            "p21_200"
             ]
 
 for elt in listname:
     os.system('./graph.sh '+elt)
+    os.system('./couple.sh '+elt)
+    os.system('./crossover.sh '+elt)
+    os.system('./mutator.sh '+elt)
